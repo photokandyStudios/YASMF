@@ -19,7 +19,7 @@
  * VerticalSwipeGesture do.
  *
  * The LongPressGesture will fire off an event when a longpress is recognized.
- * How this is recognized is partially defined by the caller -- that is, 
+ * How this is recognized is partially defined by the caller -- that is,
  * two durations can be supplied. By default, the long-press is recognized at
  * 1s and cancelled at 3s (assuming no previous recognition). It is also
  * cancelled should any movement outside of a 25px radius occur.
@@ -69,15 +69,20 @@
  *
  ******************************************************************************/
 
-var GESTURES = GESTURES || {};  // create the namespace
+var GESTURES = GESTURES ||
+{
+};
+// create the namespace
 GESTURES.consoleLogging = false;
 
-GESTURES.SimpleGesture = function ( element )
+GESTURES.SimpleGesture = function(element)
 {
   var self = this;
-  
-  self.theElement = {};
-  
+
+  self.theElement =
+  {
+  };
+
   self._touchStartX = 0;
   self._touchStartY = 0;
   self._touchX = 0;
@@ -87,107 +92,109 @@ GESTURES.SimpleGesture = function ( element )
   self._duration = 0;
   self._timerId = -1;
   self._distance = 0;
-  self._event = {};
+  self._event =
+  {
+  };
   self._cleared = false;
-  
-  self.attachToElement = function ( element )
+
+  self.attachToElement = function(element)
   {
     // get our element
     self.theElement = element;
     // attach our listeners
-    self.theElement.addEventListener ( "touchstart", self.touchStart, false );
-    self.theElement.addEventListener ( "touchmove",  self.touchMove , false );
-    self.theElement.addEventListener ( "touchend",   self.touchEnd,   false );
+    self.theElement.addEventListener("touchstart", self.touchStart, false);
+    self.theElement.addEventListener("touchmove", self.touchMove, false);
+    self.theElement.addEventListener("touchend", self.touchEnd, false);
 
-    self.theElement.addEventListener ( "mousedown",  self.mouseDown,  false );
-    self.theElement.addEventListener ( "mousemove",  self.mouseMove,  false );
-    self.theElement.addEventListener ( "mouseup",    self.mouseUp,    false );
-    
+    self.theElement.addEventListener("mousedown", self.mouseDown, false);
+    self.theElement.addEventListener("mousemove", self.mouseMove, false);
+    self.theElement.addEventListener("mouseup", self.mouseUp, false);
+
   }
-  
-  self.recognizeGesture = function ( o )
+
+  self.recognizeGesture = function(o)
   {
     // we do nothing; no gesture to recognize.
-    if (GESTURES.consoleLogging) { console.log ("default recognizer..."); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("default recognizer...");
+    }
   }
-  
-  self.attachGestureRecognizer = function ( fn )
+
+  self.attachGestureRecognizer = function(fn)
   {
     self.recognizeGesture = fn;
   }
-  
-  self.updateGesture = function ()
+
+  self.updateGesture = function()
   {
     self._duration += 100;
-    self._distance = Math.sqrt((self._deltaX * self._deltaX) +
-                            (self._deltaY * self._deltaY));
-    if (GESTURES.consoleLogging) {
-        console.log ("gesture: start: (" + self._touchStartX +
-                                     "," + self._touchStartY +
-                          ") current: (" + self._touchX +
-                                     "," + self._touchY +
-                            ") delta: (" + self._deltaX +
-                                     "," + self._deltaY +
-                             ") delay: " + self._duration +
-                                  "ms, " + self._distance + "px");
+    self._distance = Math.sqrt((self._deltaX * self._deltaX) + (self._deltaY * self._deltaY));
+    if (GESTURES.consoleLogging)
+    {
+      console.log("gesture: start: (" + self._touchStartX + "," + self._touchStartY + ") current: (" + self._touchX + "," + self._touchY + ") delta: (" + self._deltaX + "," + self._deltaY + ") delay: " + self._duration + "ms, " + self._distance + "px");
     }
     if (!self._cleared)
     {
-      self.recognizeGesture( self );
+      self.recognizeGesture(self);
     }
   }
-  
-  self.clearEvent = function ()
+
+  self.clearEvent = function()
   {
     if (self._cleared)
     {
-        if (self._event.cancelBubble)
-        {
-          self._event.cancelBubble();
-        }
-        if (self._event.stopPropagation)
-        {
-          self._event.stopPropagation();
-        }
-        if (self._event.preventDefault)
-        {
-          self._event.preventDefault();
-        }
-        else
-        {
-          self._event.returnValue = false;
-        }
+      if (self._event.cancelBubble)
+      {
+        self._event.cancelBubble();
+      }
+      if (self._event.stopPropagation)
+      {
+        self._event.stopPropagation();
+      }
+      if (self._event.preventDefault)
+      {
+        self._event.preventDefault();
+      } else
+      {
+        self._event.returnValue = false;
+      }
     }
-    if (self._timerId>-1)
+    if (self._timerId > -1)
     {
-      clearInterval (self._timerId);
+      clearInterval(self._timerId);
       self._timerId = -1;
     }
     self._cleared = true;
   }
-  
-  self.eventStart = function ()
+
+  self.eventStart = function()
   {
-    if (GESTURES.consoleLogging) { console.log ("eventstart"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("eventstart");
+    }
     self._duration = 0;
     self._deltaX = 0;
     self._deltaY = 0;
     self._cleared = false;
     self._touchStartX = self._touchX;
     self._touchStartY = self._touchY;
-    self._timerId = setInterval ( self.updateGesture, 100 );
+    self._timerId = setInterval(self.updateGesture, 100);
   }
-  
-  self.touchStart = function (event)
+
+  self.touchStart = function(event)
   {
-    if (GESTURES.consoleLogging) { console.log ("touchstart"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("touchstart");
+    }
     if (event)
     {
       self._touchX = event.touches[0].screenX;
       self._touchY = event.touches[0].screenY;
       self._event = event;
-    }
-    else
+    } else
     {
       self._touchX = window.event.screenX;
       self._touchY = window.event.screenY;
@@ -196,16 +203,18 @@ GESTURES.SimpleGesture = function ( element )
     self.eventStart();
   }
 
-  self.mouseDown = function (event)
+  self.mouseDown = function(event)
   {
-    if (GESTURES.consoleLogging) { console.log ("mousedown"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("mousedown");
+    }
     if (event)
     {
       self._touchX = event.screenX;
       self._touchY = event.screenY;
       self._event = event;
-    }
-    else
+    } else
     {
       self._touchX = window.event.screenX;
       self._touchY = window.event.screenY;
@@ -214,27 +223,31 @@ GESTURES.SimpleGesture = function ( element )
     self.eventStart();
   }
 
-  self.eventMove = function ()
+  self.eventMove = function()
   {
-    if (GESTURES.consoleLogging) { console.log ("eventmove"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("eventmove");
+    }
     self._deltaX = self._touchX - self._touchStartX;
     self._deltaY = self._touchY - self._touchStartY;
-    
-    var distance = Math.sqrt((self._deltaX * self._deltaX) +
-                            (self._deltaY * self._deltaY));
+
+    var distance = Math.sqrt((self._deltaX * self._deltaX) + (self._deltaY * self._deltaY));
 
   }
-  
-  self.touchMove = function (event)
+
+  self.touchMove = function(event)
   {
-    if (GESTURES.consoleLogging) { console.log ("touchmove"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("touchmove");
+    }
     if (event)
     {
       self._touchX = event.touches[0].screenX;
       self._touchY = event.touches[0].screenY;
       self._event = event;
-    }
-    else
+    } else
     {
       self._touchX = window.event.screenX;
       self._touchY = window.event.screenY;
@@ -243,16 +256,18 @@ GESTURES.SimpleGesture = function ( element )
     self.eventMove();
   }
 
-  self.mouseMove = function (event)
+  self.mouseMove = function(event)
   {
-    if (GESTURES.consoleLogging) { console.log ("mousemove"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("mousemove");
+    }
     if (event)
     {
       self._touchX = event.screenX;
       self._touchY = event.screenY;
       self._event = event;
-    }
-    else
+    } else
     {
       self._touchX = window.event.screenX;
       self._touchY = window.event.screenY;
@@ -260,113 +275,127 @@ GESTURES.SimpleGesture = function ( element )
     }
     self.eventMove();
   }
-  
-  self.eventEnd = function ()
+
+  self.eventEnd = function()
   {
-    if (GESTURES.consoleLogging) { console.log ("eventend"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("eventend");
+    }
     self.clearEvent();
   }
-  
-  self.touchEnd = function (event)
+
+  self.touchEnd = function(event)
   {
-    if (GESTURES.consoleLogging) { console.log ("touchend"); }
-    self._event = event || window.event;
-    self.eventEnd();
-  }
-  
-  self.mouseUp = function (event)
-  {
-    if (GESTURES.consoleLogging) { console.log ("mouseup"); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("touchend");
+    }
     self._event = event || window.event;
     self.eventEnd();
   }
 
+  self.mouseUp = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log("mouseup");
+    }
+    self._event = event || window.event;
+    self.eventEnd();
+  }
   // attach to the element passed in the constructor.
-  self.attachToElement ( element );
+  self.attachToElement(element);
 }
 
-GESTURES.LongPressGesture = function( element, whatToDo, delayToRecognition, delayToCancel )
+GESTURES.LongPressGesture = function(element, whatToDo, delayToRecognition, delayToCancel)
 {
-  var myGesture = new GESTURES.SimpleGesture ( element );
+  var myGesture = new GESTURES.SimpleGesture(element);
   myGesture._delayToRecognition = delayToRecognition || 1000;
   myGesture._delayToCancel = delayToCancel || 3000;
   myGesture._whatToDo = whatToDo;
-  myGesture.attachGestureRecognizer ( function ( o )
+  myGesture.attachGestureRecognizer(function(o)
   {
-    if (GESTURES.consoleLogging) { console.log ("longpress recognizer..."); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("longpress recognizer...");
+    }
     // no finger movement
     if (o._distance < 25)
     {
       // must be between our minimum and maximum delay
-      if (o._duration >= o._delayToRecognition && o._duration <= o._delayToCancel )
+      if (o._duration >= o._delayToRecognition && o._duration <= o._delayToCancel)
       {
         // long-press recognized
         o.clearEvent();
-        o._whatToDo( o );
+        o._whatToDo(o);
       }
-    }
-    else
+    } else
     {
       o.clearEvent();
       // long-press cancelled.
     }
-  }
-  );
+  });
   return myGesture;
 }
 
-GESTURES.HorizontalSwipeGesture = function( element, whatToDo, radiusToRecognition, delayToCancel )
+GESTURES.HorizontalSwipeGesture = function(element, whatToDo, radiusToRecognition, delayToCancel)
 {
-  var myGesture = new GESTURES.SimpleGesture ( element );
+  var myGesture = new GESTURES.SimpleGesture(element);
   myGesture._radiusToRecognition = radiusToRecognition || 50;
   myGesture._delayToCancel = delayToCancel || 3000;
   myGesture._whatToDo = whatToDo;
-  myGesture.attachGestureRecognizer ( function ( o )
+  myGesture.attachGestureRecognizer(function(o)
   {
-    if (GESTURES.consoleLogging) { console.log ("horizontal recognizer..."); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("horizontal recognizer...");
+    }
     // no finger movement
     if (o._distance > o._radiusToRecognition)
     {
       // must be between our minimum and maximum delay
-      if (o._duration <= o._delayToCancel )
+      if (o._duration <= o._delayToCancel)
       {
         // finger must trace a straight line
-        if ( Math.abs(o._deltaY) < 25 )
+        if (Math.abs(o._deltaY) < 25)
         {
           o.clearEvent();
-          o._whatToDo( o );
+          o._whatToDo(o);
         }
       }
     }
-  } );
+  });
   return myGesture;
 }
 
-GESTURES.VerticalSwipeGesture = function( element, whatToDo, radiusToRecognition, delayToCancel )
+GESTURES.VerticalSwipeGesture = function(element, whatToDo, radiusToRecognition, delayToCancel)
 {
-  var myGesture = new GESTURES.SimpleGesture ( element );
+  var myGesture = new GESTURES.SimpleGesture(element);
   myGesture._radiusToRecognition = radiusToRecognition || 50;
   myGesture._delayToCancel = delayToCancel || 3000;
   myGesture._whatToDo = whatToDo;
-  myGesture.attachGestureRecognizer ( function ( o )
+  myGesture.attachGestureRecognizer(function(o)
   {
-    if (GESTURES.consoleLogging) { console.log ("vertical recognizer..."); }
+    if (GESTURES.consoleLogging)
+    {
+      console.log("vertical recognizer...");
+    }
     // no finger movement
     if (o._distance > o._radiusToRecognition)
     {
       // must be between our minimum and maximum delay
-      if (o._duration <= o._delayToCancel )
+      if (o._duration <= o._delayToCancel)
       {
         // finger must trace a straight line
-        if ( Math.abs(o._deltaX) < 25 )
+        if (Math.abs(o._deltaX) < 25)
         {
           o.clearEvent();
-          o._whatToDo( o );
+          o._whatToDo(o);
         }
       }
     }
-  }
-  );
+  });
   return myGesture;
 }
 

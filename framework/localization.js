@@ -6,54 +6,55 @@
  * localization.js
  * Author: Kerri Shotts
  *
- * Provides simple localization
+ * Provides simple localization, as described in Chapter 1 of PhoneGap HotShot.
  *
  * Relies on JQuery/Globalize.js, as found at https://github.com/jquery/globalize
  *
  ******************************************************************************/
- 
-var PKLOC = PKLOC || {};  
+
+var PKLOC = PKLOC ||
+{
+};
 
 // define our current user locale so that we don't have to calculate it
 // each time we want it
 PKLOC.currentUserLocale = "";
-PKLOC.localizedText = {};
+PKLOC.localizedText =
+{
+};
 
 /**
  *
  * Loads the JQuery Globalize script from the framework directory
  * as well as the underlying cultures definitions.
  *
- */ 
-PKLOC.initializeGlobalization = function ( completion )
+ */
+PKLOC.initializeGlobalization = function(completion)
 {
-    PKUTIL.include ( [ "./framework/globalize.js" ], completion );
+  PKUTIL.include(["./framework/globalize.js"], completion);
 }
-
 /**
  *
  * Loads the appropriate locale from the JQuery Globalize script.
  *
  */
-PKLOC.loadLocales = function ( theLocales, completion )
+PKLOC.loadLocales = function(theLocales, completion)
 {
-    for (var i=0; i<theLocales.length; i++)
-	{
-	   theLocales[i] = "./framework/cultures/globalize.culture." + theLocales[i] + ".js";
-	}
-    PKUTIL.include ( theLocales, completion );
+  for (var i = 0; i < theLocales.length; i++)
+  {
+    theLocales[i] = "./framework/cultures/globalize.culture." + theLocales[i] + ".js";
+  }
+  PKUTIL.include(theLocales, completion);
 }
-
 /**
  *
  * Sets the current locale for the JQuery Globalize script.
  *
  */
-PKLOC.setGlobalizationLocale = function( theLocale )
+PKLOC.setGlobalizationLocale = function(theLocale)
 {
-    Globalize.culture ( theLocale );
+  Globalize.culture(theLocale);
 }
-
 /**
  *
  * Add a translation to the existing translation matrix
@@ -63,19 +64,19 @@ PKLOC.setGlobalizationLocale = function( theLocale )
  * @param value:  the translated value.
  *
  */
-PKLOC.addTranslation = function (locale, key, value)
+PKLOC.addTranslation = function(locale, key, value)
 {
   if (PKLOC.localizedText[locale])
   {
     PKLOC.localizedText[locale][key] = value;
-  }
-  else
+  } else
   {
-    PKLOC.localizedText[locale] = {};
+    PKLOC.localizedText[locale] =
+    {
+    };
     PKLOC.localizedText[locale][key] = value;
   }
 }
-
 /**
  *
  * Return the user's locale (e.g., en-US or fr-FR)
@@ -91,12 +92,13 @@ PKLOC.getUserLocale = function()
     return PKLOC.currentUserLocale;
   }
   var currentPlatform = "unknown";
-  if (typeof device != 'undefined')
+  if ( typeof device != 'undefined')
   {
     currentPlatform = device.platform;
   }
-  var userLocale = "en-US";    // a suitable default
-  
+  var userLocale = "en-US";
+  // a suitable default
+
   if (currentPlatform == "Android")
   {
     // parse the navigator.userAgent
@@ -105,52 +107,47 @@ PKLOC.getUserLocale = function()
     var tempLocale = userAgent.match(/Android.*([a-zA-Z]{2}-[a-zA-Z]{2})/);
     if (tempLocale)
     {
-        userLocale = tempLocale[1];
+      userLocale = tempLocale[1];
     }
-  }
-  else
+  } else
   {
-    userLocale = navigator.language ||
-                 navigator.browserLanguage ||
-                 navigator.systemLanguage ||
-                 navigator.userLanguage;
+    userLocale = navigator.language || navigator.browserLanguage || navigator.systemLanguage || navigator.userLanguage;
     userLocale = userLocale;
   }
-  
+
   PKLOC.currentUserLocale = userLocale;
   return PKLOC.currentUserLocale;
 }
 
-
-PKLOC.substituteVariables = function ( theString, theParms )
+PKLOC.substituteVariables = function(theString, theParms)
 {
   var currentValue = theString;
 
   // handle replacement variables
   if (theParms)
   {
-    for (var i=1; i<=theParms.length; i++)
+    for (var i = 1; i <= theParms.length; i++)
     {
-      currentValue = currentValue.replace("%" + i, theParms[i-1]);
+      currentValue = currentValue.replace("%" + i, theParms[i - 1]);
     }
   }
-  
+
   return currentValue;
 }
 
-PKLOC.lookupTranslation = function ( key, theLocale )
+PKLOC.lookupTranslation = function(key, theLocale)
 {
   var userLocale = theLocale || PKLOC.getUserLocale();
-  
+
   // look it up by checking if userLocale exists, and then if the key (uppercased) exists
-  if ( PKLOC.localizedText[userLocale] )
+  if (PKLOC.localizedText[userLocale])
   {
-    if ( PKLOC.localizedText[userLocale][key.toUpperCase()] )
+    if (PKLOC.localizedText[userLocale][key.toUpperCase()])
     {
-       return PKLOC.localizedText[userLocale][key.toUpperCase()];
+      return PKLOC.localizedText[userLocale][key.toUpperCase()];
     }
   }
-  
+
   // if not found, we don't return anything but null
   return null;
 }
@@ -169,20 +166,20 @@ function __T(key, parms, locale)
 {
   var userLocale = locale || PKLOC.getUserLocale();
   var currentValue = "";
-  
-  if (! (currentValue=PKLOC.lookupTranslation(key, userLocale)) )
+
+  if (!( currentValue = PKLOC.lookupTranslation(key, userLocale)))
   {
     // we haven't found it under the given locale (of form: xx-XX), try the fallback locale (xx)
-    userLocale = userLocale.substr(0,2);
-    if (! (currentValue=PKLOC.lookupTranslation(key, userLocale)) )
+    userLocale = userLocale.substr(0, 2);
+    if (!( currentValue = PKLOC.lookupTranslation(key, userLocale)))
     {
       // we haven't found it under any of the given locales; try en-US
-      userLocale = "en-US";      
-      if (! (currentValue=PKLOC.lookupTranslation(key, userLocale)) )
+      userLocale = "en-US";
+      if (!( currentValue = PKLOC.lookupTranslation(key, userLocale)))
       {
         // we haven't found it under any of the given locales; try en
-        userLocale = "en";      
-        if (! (currentValue=PKLOC.lookupTranslation(key, userLocale)) )
+        userLocale = "en";
+        if (!( currentValue = PKLOC.lookupTranslation(key, userLocale)))
         {
           // we didn't find it at all... we'll use the key
           currentValue = key;
@@ -190,8 +187,8 @@ function __T(key, parms, locale)
       }
     }
   }
-  
-  return PKLOC.substituteVariables( currentValue, parms );
+
+  return PKLOC.substituteVariables(currentValue, parms);
 }
 
 /**
@@ -207,15 +204,15 @@ function __T(key, parms, locale)
  * the number of digits is more than the actual number of digits, zeroes are added.
  *
  */
- 
-function __N ( theNumber, theFormat, theLocale )
+
+function __N(theNumber, theFormat, theLocale)
 {
   var iFormat = "n" + theFormat;
   var iLocale = theLocale || PKLOC.getUserLocale();
-  
-  PKLOC.setGlobalizationLocale ( iLocale);
-  
-  return Globalize.format ( theNumber, iFormat );
+
+  PKLOC.setGlobalizationLocale(iLocale);
+
+  return Globalize.format(theNumber, iFormat);
 }
 
 /**
@@ -231,14 +228,14 @@ function __N ( theNumber, theFormat, theLocale )
  * the number of digits is more than the actual number of digits, zeroes are added.
  *
  */
-function __C ( theNumber, theFormat, theLocale )
+function __C(theNumber, theFormat, theLocale)
 {
   var iFormat = "c" + theFormat;
   var iLocale = theLocale || PKLOC.getUserLocale();
-  
-  PKLOC.setGlobalizationLocale ( iLocale);
-  
-  return Globalize.format ( theNumber, iFormat );
+
+  PKLOC.setGlobalizationLocale(iLocale);
+
+  return Globalize.format(theNumber, iFormat);
 }
 
 /**
@@ -252,14 +249,14 @@ function __C ( theNumber, theFormat, theLocale )
  * @returns the number formatted according to the locale's percent settings.
  *
  */
-function __PCT ( theNumber, theFormat, theLocale )
+function __PCT(theNumber, theFormat, theLocale)
 {
   var iFormat = "p" + theFormat;
   var iLocale = theLocale || PKLOC.getUserLocale();
-  
-  PKLOC.setGlobalizationLocale ( iLocale);
-  
-  return Globalize.format ( theNumber, iFormat );
+
+  PKLOC.setGlobalizationLocale(iLocale);
+
+  return Globalize.format(theNumber, iFormat);
 }
 
 /**
@@ -270,17 +267,16 @@ function __PCT ( theNumber, theFormat, theLocale )
  * @param theFormat:       (optional) The format of the date; "d" is assumed if not provided.
  * @param theLocale:       (optional) the locale. If not specified, current locale is assumed.
  *
- * @returns the date formatted according to the locale's settings. 
+ * @returns the date formatted according to the locale's settings.
  *
  */
-function __D ( theDate, theFormat, theLocale )
+function __D(theDate, theFormat, theLocale)
 {
   var iFormat = theFormat || "d";
   var iLocale = theLocale || PKLOC.getUserLocale();
-  
-  PKLOC.setGlobalizationLocale ( iLocale);
-  
-  return Globalize.format ( theDate, iFormat );
-}
 
+  PKLOC.setGlobalizationLocale(iLocale);
+
+  return Globalize.format(theDate, iFormat);
+}
 

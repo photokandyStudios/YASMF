@@ -9,10 +9,15 @@
  *
  ******************************************************************************/
 
-var PKDEVICE = PKDEVICE || {};  // create the namespace
+var PKDEVICE = PKDEVICE ||
+{
+};
+// create the namespace
 
-PKDEVICE.platformOverride = false;  // change me for testing in a browser...
-PKDEVICE.formFactorOverride = false; // change me for testing in a browser
+PKDEVICE.platformOverride = false;
+// change me for testing in a browser...
+PKDEVICE.formFactorOverride = false;
+// change me for testing in a browser
 
 /**
  *
@@ -20,21 +25,19 @@ PKDEVICE.formFactorOverride = false; // change me for testing in a browser
  * other than "false", it is returned instead.
  *
  */
-PKDEVICE.platform = function ()
+PKDEVICE.platform = function()
 {
   if (PKDEVICE.platformOverride)
   {
     return PKDEVICE.platformOverride.toLowerCase();
   }
   var thePlatform = device.platform.toLowerCase();
-  if (thePlatform.indexOf("ipad") > -1 ||
-      thePlatform.indexOf("iphone") > -1)
+  if (thePlatform.indexOf("ipad") > -1 || thePlatform.indexOf("iphone") > -1)
   {
-      thePlatform = "ios";
+    thePlatform = "ios";
   }
   return thePlatform;
 }
-
 /**
  *
  * Returns the device's form factor. Possible values are "tablet" and
@@ -42,24 +45,30 @@ PKDEVICE.platform = function ()
  * instead.
  *
  */
-PKDEVICE.formFactor = function ()
+PKDEVICE.formFactor = function()
 {
   if (PKDEVICE.formFactorOverride)
   {
     return PKDEVICE.formFactorOverride.toLowerCase();
   }
-  if  (navigator.platform == "iPad")                { return "tablet"; }
-  if ((navigator.platform == "iPhone") ||
-      (navigator.platform == "iPhone Simulator"))   { return "phone"; }
-  
+  if (navigator.platform == "iPad")
+  {
+    return "tablet";
+  }
+  if ((navigator.platform == "iPhone") || (navigator.platform == "iPhone Simulator"))
+  {
+    return "phone";
+  }
+
   // the following is hacky, and not guaranteed to work all the time,
   // especially as phones get bigger screens.
-  
-  if ( Math.max( window.screen.width,
-                 window.screen.height ) < 1024 )    { return "phone"; }
-                                                      return "tablet";
-}
 
+  if (Math.max(window.screen.width, window.screen.height) < 1024)
+  {
+    return "phone";
+  }
+  return "tablet";
+}
 /**
  *
  * Determines if the device is in Portrait orientation.
@@ -67,11 +76,8 @@ PKDEVICE.formFactor = function ()
  */
 PKDEVICE.isPortrait = function()
 {
-    return window.orientation == 0 || 
-           window.orientation == 180 || 
-           window.location.href.indexOf("portrait")>-1;
+  return window.orientation == 0 || window.orientation == 180 || window.location.href.indexOf("portrait") > -1;
 }
-
 /**
  *
  * Determines if the device is in Landscape orientation.
@@ -79,13 +85,12 @@ PKDEVICE.isPortrait = function()
  */
 PKDEVICE.isLandscape = function()
 {
-    if (window.location.href.indexOf("landscape")>-1)
-    {
-        return true;
-    }
-    return !PKDEVICE.isPortrait();
+  if (window.location.href.indexOf("landscape") > -1)
+  {
+    return true;
+  }
+  return !PKDEVICE.isPortrait();
 }
-
 /**
  *
  * Determines if the device is a hiDPI device (aka retina)
