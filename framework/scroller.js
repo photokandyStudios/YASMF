@@ -1,4 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
 /******************************************************************************
  *
  * SCROLLER
@@ -51,6 +50,27 @@
  *  - A little too willing to call a scroll a "click".
  *
  ******************************************************************************/
+
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:true,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+
+/*global device */
 
 var SCROLLER = SCROLLER ||
 {
@@ -115,7 +135,7 @@ SCROLLER.GenericScroller = function(element)
     {
       if (device.platform == "Android")
       {
-        self.theElement.style.webkitTransform = "translate3d(0,0,0)";
+        //self.theElement.style.webkitTransform = "translate3d(0,0,0)";
       }
     } else
     {
@@ -244,7 +264,7 @@ SCROLLER.GenericScroller = function(element)
         {
           // we'll permit 10 frames of animation
           self._actualX -= self._deltaX / (self._step);
-          self._actualY -= self._deltaY / (self._step);
+          self._actualY -= (self._deltaY) / (self._step);
           self.theElement.parentNode.scrollTop = -self._actualY;
           self.theElement.parentNode.scrollLeft = -self._actualX;
         } else
@@ -253,8 +273,8 @@ SCROLLER.GenericScroller = function(element)
           clearInterval(self._timer);
           self._timer = -1;
         }
-      }, 10);
-      // 10 = as fast as possible
+      }, 17);
+      // 17 = as fast as possible
     }
   }
   // attach to the element passed in the constructor.
