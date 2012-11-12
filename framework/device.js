@@ -1,4 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
 /******************************************************************************
  *
  * DEVICE
@@ -8,6 +7,26 @@
  * state
  *
  ******************************************************************************/
+
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global device */
 
 var PKDEVICE = PKDEVICE ||
 {
@@ -76,7 +95,7 @@ PKDEVICE.formFactor = function()
  */
 PKDEVICE.isPortrait = function()
 {
-  return window.orientation == 0 || window.orientation == 180 || window.location.href.indexOf("portrait") > -1;
+  return window.orientation === 0 || window.orientation == 180 || window.location.href.indexOf("portrait") > -1;
 }
 /**
  *
@@ -99,4 +118,24 @@ PKDEVICE.isLandscape = function()
 PKDEVICE.isRetina = function()
 {
   return window.devicePixelRatio > 1;
+}
+
+PKDEVICE.iPad = function ()
+{
+  return PKDEVICE.platform()==="ios" && PKDEVICE.formFactor()==="tablet";
+}
+
+PKDEVICE.iPhone = function ()
+{
+  return PKDEVICE.platform()==="ios" && PKDEVICE.formFactor()==="phone";
+}
+
+PKDEVICE.droidPhone = function ()
+{
+  return PKDEVICE.platform()==="android" && PKDEVICE.formFactor()==="phone";
+}
+
+PKDEVICE.droidTablet = function ()
+{
+  return PKDEVICE.platform()==="android" && PKDEVICE.formFactor()==="tablet";
 }
