@@ -1,4 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
 /******************************************************************************
  *
  * UTILITY
@@ -7,15 +6,36 @@
  * This library includes simple utility functions
  *
  ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global PKLOC, device, cordova */
 
-var PKUTIL = PKUTIL || {};  // create the namespace
+var PKUTIL = PKUTIL ||
+{
+};
+// create the namespace
 
 //
 // Properties
 //
 PKUTIL.COMPLETION_SUCCESS = true;
 PKUTIL.COMPLETION_FAILURE = false;
-
 
 //
 // Methods
@@ -26,9 +46,9 @@ PKUTIL.COMPLETION_FAILURE = false;
  * Returns an element specified by elementId. Similar to (but not exactly like) jQuery's $()
  *
  */
-function $ge ( elementId )
+function $ge(elementId)
 {
-  return document.getElementById ( elementId );
+  return document.getElementById(elementId);
 }
 
 /**
@@ -38,22 +58,35 @@ function $ge ( elementId )
  * elements have the locale after the elementId appended with an underscore.
  * (eg: thisElementIsLocalized_enus and thisElementIsLocalized_eses)
  */
-function $geLocale ( elementId )
+function $geLocale(elementId)
 {
   var currentLocale = PKLOC.getUserLocale();
   var theLocalizedElementId = elementId + "_" + currentLocale;
-  if ($ge(theLocalizedElementId)) { return $ge(theLocalizedElementId); }
+  if ($ge(theLocalizedElementId))
+  {
+    return $ge(theLocalizedElementId);
+  }
 
-  theLocalizedElementId = elementId + "_" + currentLocale.substr(0,2);
-  if ($ge(theLocalizedElementId)) { return $ge(theLocalizedElementId); }
+  theLocalizedElementId = elementId + "_" + currentLocale.substr(0, 2);
+  if ($ge(theLocalizedElementId))
+  {
+    return $ge(theLocalizedElementId);
+  }
 
   theLocalizedElementId = elementId + "_en-US";
-  if ($ge(theLocalizedElementId)) { return $ge(theLocalizedElementId); }
+  if ($ge(theLocalizedElementId))
+  {
+    return $ge(theLocalizedElementId);
+  }
 
   theLocalizedElementId = elementId + "_en";
-  if ($ge(theLocalizedElementId)) { return $ge(theLocalizedElementId); }
+  if ($ge(theLocalizedElementId))
+  {
+    return $ge(theLocalizedElementId);
+  }
 
-  return $ge( elementId ); // we don't have it; return the default element.
+  return $ge(elementId);
+  // we don't have it; return the default element.
 }
 
 /**
@@ -61,7 +94,7 @@ function $geLocale ( elementId )
  * Similar to $$. Returns all classes matching a selector.
  *
  */
-function $gac ( selector )
+function $gac(selector)
 {
   return Array.prototype.slice.call(document.querySelectorAll(selector));
 }
@@ -71,11 +104,10 @@ function $gac ( selector )
  * Utility function to delay execution of code
  *
  */
-PKUTIL.delay = function ( theDelay, theFunction )
+PKUTIL.delay = function(theDelay, theFunction)
 {
-  return setTimeout ( theFunction, theDelay);
+  return setTimeout(theFunction, theDelay);
 }
-
 /**
  *
  * Loads a file or URL and returns it to the completion
@@ -91,92 +123,85 @@ PKUTIL.loadQueue = Array();
 PKUTIL.XHRinProgress = false;
 PKUTIL.XHRTimer = -1;
 
-PKUTIL.load = function ( theFileName, aSync, completion )
+PKUTIL.load = function(theFileName, aSync, completion)
 {
   if (device.platform != "WinCE")
   {
-    PKUTIL._load ( theFileName, aSync, completion );
-	return;
+    PKUTIL._load(theFileName, aSync, completion);
+    return;
   }
-  console.log ("Pushing request to load XHR: " + theFileName );
-  PKUTIL.loadQueue.push ( function () 
-                          {
-						    console.log ("Processing XHR " + theFileName);
-						    PKUTIL._load ( theFileName, aSync, completion ); 
-						  } 
-						) ;
+  console.log("Pushing request to load XHR: " + theFileName);
+  PKUTIL.loadQueue.push(function()
+  {
+    console.log("Processing XHR " + theFileName);
+    PKUTIL._load(theFileName, aSync, completion);
+  });
 
   if (PKUTIL.XHRTimer < 0)
   {
-    PKUTIL.XHRTimer = setInterval ( PKUTIL._XHRQueue, 100 );
+    PKUTIL.XHRTimer = setInterval(PKUTIL._XHRQueue, 100);
   }
 }
 
-PKUTIL._XHRQueue = function ()
+PKUTIL._XHRQueue = function()
 {
   if (PKUTIL.XHRinProgress)
   {
     return;
   }
-  if (PKUTIL.loadQueue.length>0)
+  if (PKUTIL.loadQueue.length > 0)
   {
     var f = PKUTIL.loadQueue.pop();
-	f();
+    f();
   }
 }
 
-PKUTIL._load = function ( theFileName, aSync, completion )
+PKUTIL._load = function(theFileName, aSync, completion)
 {
-  if (!window.XMLHttpRequest) 
-  { 
-    if (completion) 
+  if (!window.XMLHttpRequest)
+  {
+    if (completion)
     {
-      completion ( PKUTIL.COMPLETION_FAILURE,
-                   "This browser does not support XMLHttpRequest." );
+      completion(PKUTIL.COMPLETION_FAILURE, "This browser does not support XMLHttpRequest.");
       return;
     }
   }
 
-  PKUTIL.XHRinProgress = true; 
-   
+  PKUTIL.XHRinProgress = true;
+
   var r = new XMLHttpRequest();
   r.onreadystatechange = function()
   {
-    if (r.readyState == 4)  // loaded
+    if (r.readyState == 4)// loaded
     {
-      if ( r.status==200 || r.status == 0)  // success
+      if (r.status == 200 || r.status === 0)// success
       {
         if (completion)
         {
-		  console.log ("success loading " + theFileName + ", length " + r.responseText.length);
-          completion ( PKUTIL.COMPLETION_SUCCESS,
-                       r.responseText );
-  PKUTIL.XHRinProgress = false; 
-        } 
-      }
-      else  // failed to load
+          console.log("success loading " + theFileName + ", length " + r.responseText.length);
+          completion(PKUTIL.COMPLETION_SUCCESS, r.responseText);
+          PKUTIL.XHRinProgress = false;
+        }
+      } else// failed to load
       {
         if (completion)
         {
-          completion ( PKUTIL.COMPLETION_FAILURE,
-                       r.status );
-  PKUTIL.XHRinProgress = false; 
+          completion(PKUTIL.COMPLETION_FAILURE, r.status);
+          PKUTIL.XHRinProgress = false;
         }
       }
     }
   }
-  if (device.platform=="WinCE" && theFileName.substr(0,4) != "http")
+  if (device.platform == "WinCE" && theFileName.substr(0, 4) != "http")
   {
-    r.open ('GET', "/app/www/" + theFileName, true); 
-  }
-  else
+    r.open('GET', "/app/www/" + theFileName, true);
+  } else
   {
-    r.open ('GET', theFileName, aSync); 
+    r.open('GET', theFileName, aSync);
   }
-  r.send ( );
-      
-}
+  r.send();
 
+}
 /**
  *
  * Javascript doesn't provide any native include functionality,
@@ -189,19 +214,19 @@ PKUTIL._load = function ( theFileName, aSync, completion )
  * mean that larger files may take longer to process.
  *
  */
-PKUTIL.include = function ( theScripts, completion )
+PKUTIL.include = function(theScripts, completion)
 {
   var theNewScripts = theScripts;
-  if (theNewScripts.length == 0)
+  if (theNewScripts.length === 0)
   {
-	  if (completion)
-	  {
-	     completion();
-	  }
-	  return;
+    if (completion)
+    {
+      completion();
+    }
+    return;
   }
   var theScriptName = theNewScripts.pop();
-  PKUTIL.load ( theScriptName, true, function ( success, data )
+  PKUTIL.load(theScriptName, true, function(success, data)
   {
     if (success)
     {
@@ -209,17 +234,15 @@ PKUTIL.include = function ( theScripts, completion )
       theScriptElement.type = "text/javascript";
       theScriptElement.charset = "utf-8";
       theScriptElement.text = data;
-      document.body.appendChild ( theScriptElement ); // add it as a script tag
-    }
-    else
+      document.body.appendChild(theScriptElement);
+      // add it as a script tag
+    } else
     {
-      console.log ("WARNING: Failed to load " + theScriptName );
+      console.log("WARNING: Failed to load " + theScriptName);
     }
-    PKUTIL.include ( theNewScripts, completion );
-  }
-  );
+    PKUTIL.include(theNewScripts, completion);
+  });
 }
-
 /**
  *
  * Loads an HTML fragment, creates a DIV, and adds it to the DOM.
@@ -242,10 +265,10 @@ PKUTIL.include = function ( theScripts, completion )
  *                              can be determined.
  *
  */
-PKUTIL.loadHTML = function ( theFileName, options, completion )
+PKUTIL.loadHTML = function(theFileName, options, completion)
 {
   var aSync = options["aSync"];
-  PKUTIL.load ( theFileName, aSync, function ( success, data )
+  PKUTIL.load(theFileName, aSync, function(success, data)
   {
     if (success)
     {
@@ -253,35 +276,34 @@ PKUTIL.loadHTML = function ( theFileName, options, completion )
       var theId = options["id"];
       var theClass = options["className"];
       var attachTo = options["attachTo"];
-    
+
       // create the DIV element that will contain the data
-      var theElement = document.createElement ("DIV");
-      theElement.setAttribute ("id", theId);
-      theElement.setAttribute ("class", theClass);
-      
+      var theElement = document.createElement("DIV");
+      theElement.setAttribute("id", theId);
+      theElement.setAttribute("class", theClass);
+
       // make sure the element isn't visible, yet
       theElement.style.display = "none";
-      
+
       // add the data
       theElement.innerHTML = data;
-      
+
       // add it to the DOM
       if (attachTo)
       {
-        attachTo.appendChild (theElement);
-      }
-      else
+        attachTo.appendChild(theElement);
+      } else
       {
-        document.body.appendChild (theElement);
+        document.body.appendChild(theElement);
       }
-            
+
       // now, handle the scripts that might be in there
-      var theScriptTags = theElement.getElementsByTagName ("script");
-      for (var i=0;i<theScriptTags.length;i++)
+      var theScriptTags = theElement.getElementsByTagName("script");
+      for (var i = 0; i < theScriptTags.length; i++)
       {
         // try...catch to get an indication that the /script/ is what is
         // causing an error, not this block.
-        try 
+        try
         {
           // inspired by http://bytes.com/topic/javascript/answers/513633-innerhtml-script-tag
           var theScriptElement = document.createElement("script");
@@ -290,35 +312,30 @@ PKUTIL.loadHTML = function ( theFileName, options, completion )
           if (theScriptTags[i].src)
           {
             theScriptElement.src = theScriptTags[i].src;
-          }
-          else
+          } else
           {
             theScriptElement.text = theScriptTags[i].text;
           }
-          document.body.appendChild (theScriptElement);
-        }
-        catch ( err )
+          document.body.appendChild(theScriptElement);
+        } catch ( err )
         {
-          console.log ( "When loading " + theFileName + ", error: " + err );
+          console.log("When loading " + theFileName + ", error: " + err);
         }
       }
       if (completion)
       {
-        completion (PKUTIL.COMPLETION_SUCCESS);
+        completion(PKUTIL.COMPLETION_SUCCESS);
       }
-    }
-    else
+    } else
     {
-      console.log ("WARNING: Failed to load " + theFileName );
+      console.log("WARNING: Failed to load " + theFileName);
       if (completion)
       {
-        completion (PKUTIL.COMPLETION_FAILURE);
+        completion(PKUTIL.COMPLETION_FAILURE);
       }
     }
-  }
-  );
+  });
 }
-
 /**
  *
  * Retrieves a JSON string from the specified URL, and executes completion.
@@ -328,33 +345,32 @@ PKUTIL.loadHTML = function ( theFileName, options, completion )
  * @param completion function of the from ( success, data )
  *
  */
-PKUTIL.loadJSON = function ( theURL, completion )
+PKUTIL.loadJSON = function(theURL, completion)
 {
-  PKUTIL.load( theURL, true, function ( success, data )
+  PKUTIL.load(theURL, true, function(success, data)
+  {
+    var theParsedData =
     {
-      var theParsedData = {};
-      
-      if (success)
+    };
+
+    if (success)
+    {
+      try
       {
-        try
-        {
-          theParsedData = JSON.parse ( data );
-        }
-        catch (err)
-        {
-          console.log ("Failed to parse JSON from " + theURL);
-          success = COMPLETION_FAILURE;
-        }
-      }
-      // call completion, if available
-      if (completion)
+        theParsedData = JSON.parse(data);
+      } catch (err)
       {
-        completion (success, theParsedData);
+        console.log("Failed to parse JSON from " + theURL);
+        success = PKUTIL.COMPLETION_FAILURE;
       }
     }
-  );
+    // call completion, if available
+    if (completion)
+    {
+      completion(success, theParsedData);
+    }
+  });
 }
-
 /**
  *
  * Shows an instance of the ChildBrowser plugin with the given URL
@@ -362,27 +378,26 @@ PKUTIL.loadJSON = function ( theURL, completion )
  * be properly installed, or the function will not work.
  *
  */
-PKUTIL.showURL = function ( theURL )
+PKUTIL.showURL = function(theURL)
 {
-    switch (device.platform)
-    {
-case "Android":
-        window.plugins.childBrowser.showWebPage( theURL );
-        break;
-case "WinCE":
-		  var options = 
-		  {
-			 url:theURL,
-			 geolocationEnabled:false
-		  };
-          Cordova.exec(null, null,"ChildBrowserCommand","showWebPage", options);
-        break;
-default:
-        // iOS
-        cordova.exec("ChildBrowserCommand.showWebPage", theURL);
-    }
+  switch (device.platform)
+  {
+    case "Android":
+      window.plugins.childBrowser.showWebPage(theURL);
+      break;
+    case "WinCE":
+      var options =
+      {
+        url : theURL,
+        geolocationEnabled : false
+      };
+      cordova.exec(null, null, "ChildBrowserCommand", "showWebPage", options);
+      break;
+    default:
+      // iOS
+      cordova.exec("ChildBrowserCommand.showWebPage", theURL);
+  }
 }
-
 /**
  *
  * instanceOfTemplate returns an HTML string ready for insertion into the DOM
@@ -391,67 +406,68 @@ default:
  *
  **/
 
-PKUTIL.instanceOfTemplate = function ( templateElement, replacements )
+PKUTIL.instanceOfTemplate = function(templateElement, replacements)
 {
-    var templateHTML = templateElement.innerHTML;
-    for (var theVar in replacements)
+  var templateHTML = templateElement.innerHTML || templateElement;
+  for (var theVar in replacements)
+  {
+    while (templateHTML.indexOf('%' + theVar.toUpperCase() + '%') > -1)
     {
-        while ( templateHTML.indexOf ( '%' + theVar.toUpperCase() + '%' ) > -1 )
-        {
-            templateHTML = templateHTML.replace ( '%' + theVar.toUpperCase() + '%', replacements[theVar] );
-        }
+      templateHTML = templateHTML.replace('%' + theVar.toUpperCase() + '%', replacements[theVar]);
     }
-    return templateHTML;
+  }
+  return templateHTML;
 }
-
 /**
  *
  * Filename Handling
  *
  */
-PKUTIL.FILE = PKUTIL.FILE || {};
+PKUTIL.FILE = PKUTIL.FILE ||
+{
+};
 PKUTIL.FILE.invalidCharacters = "/,\\,:,|,<,>,*,?,;,%".split(",");
 PKUTIL.FILE.extensionSeparator = ".";
 PKUTIL.FILE.pathSeparator = "/";
 
-PKUTIL.FILE.convertToValidFileName = function ( theFileName )
+PKUTIL.FILE.convertToValidFileName = function(theFileName)
 {
   var theNewFileName = theFileName;
-  for (var i=0;i<PKUTIL.FILE.invalidCharacters.length;i++)
+  for (var i = 0; i < PKUTIL.FILE.invalidCharacters.length; i++)
   {
-    var d=0;
-    while ( theNewFileName.indexOf ( PKUTIL.FILE.invalidCharacters[i] ) > -1 && (d++)<50)
+    var d = 0;
+    while (theNewFileName.indexOf(PKUTIL.FILE.invalidCharacters[i]) > -1 && (d++) < 50)
     {
-      theNewFileName = theNewFileName.replace ( PKUTIL.FILE.invalidCharacters[i], "-" );
+      theNewFileName = theNewFileName.replace(PKUTIL.FILE.invalidCharacters[i], "-");
     }
   }
   return theNewFileName;
 }
 
-PKUTIL.FILE.getFilePart = function ( theFileName )
+PKUTIL.FILE.getFilePart = function(theFileName)
 {
-  var theSlashPosition = theFileName.lastIndexOf ( PKUTIL.FILE.pathSeparator );
+  var theSlashPosition = theFileName.lastIndexOf(PKUTIL.FILE.pathSeparator);
   if (theSlashPosition < 0)
   {
     return theFileName;
   }
-  return theFileName.substr(theSlashPosition+1, theFileName.length - theSlashPosition );
+  return theFileName.substr(theSlashPosition + 1, theFileName.length - theSlashPosition);
 }
 
-PKUTIL.FILE.getPathPart = function ( theFileName )
+PKUTIL.FILE.getPathPart = function(theFileName)
 {
-  var theSlashPosition = theFileName.lastIndexOf ( PKUTIL.FILE.pathSeparator );
+  var theSlashPosition = theFileName.lastIndexOf(PKUTIL.FILE.pathSeparator);
   if (theSlashPosition < 0)
   {
     return "";
   }
-  return theFileName.substr(0,theSlashPosition+1);
+  return theFileName.substr(0, theSlashPosition + 1);
 }
 
-PKUTIL.FILE.getFileNamePart = function ( theFileName )
+PKUTIL.FILE.getFileNamePart = function(theFileName)
 {
-  var theFileNameNoPath = PKUTIL.FILE.getFilePart (theFileName);
-  var theDotPosition = theFileNameNoPath.lastIndexOf ( PKUTIL.FILE.extensionSeparator );
+  var theFileNameNoPath = PKUTIL.FILE.getFilePart(theFileName);
+  var theDotPosition = theFileNameNoPath.lastIndexOf(PKUTIL.FILE.extensionSeparator);
   if (theDotPosition < 0)
   {
     return theFileNameNoPath;
@@ -459,14 +475,33 @@ PKUTIL.FILE.getFileNamePart = function ( theFileName )
   return theFileNameNoPath.substr(0, theDotPosition);
 }
 
-PKUTIL.FILE.getFileExtensionPart = function ( theFileName )
+PKUTIL.FILE.getFileExtensionPart = function(theFileName)
 {
-  var theFileNameNoPath = PKUTIL.FILE.getFilePart (theFileName);
-  var theDotPosition = theFileNameNoPath.lastIndexOf ( PKUTIL.FILE.extensionSeparator );
+  var theFileNameNoPath = PKUTIL.FILE.getFilePart(theFileName);
+  var theDotPosition = theFileNameNoPath.lastIndexOf(PKUTIL.FILE.extensionSeparator);
   if (theDotPosition < 0)
   {
     return "";
   }
-  return theFileNameNoPath.substr(theDotPosition+1, theFileNameNoPath.length - theDotPosition - 1);
+  return theFileNameNoPath.substr(theDotPosition + 1, theFileNameNoPath.length - theDotPosition - 1);
 }
+
+// sometimes one needs a psuedo-guid:
+// see http://stackoverflow.com/a/8809472
+PKUTIL.getGUID = function() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+PKUTIL.getUnixTime = function ()
+{
+  return (new Date()).getTime();
+}
+
+
 

@@ -1,562 +1,511 @@
-body
-{
-    margin: 0 0;
-    font-family: Helvetica, Arial, Serif;
-    font-size: 15px;
-    line-height: 150%;
-    color: #333;
-    background-color: #000;
-
-    -webkit-tap-highlight-color:rgba(0,0,0,0);
-	-ms-tap-highlight-color:rgba(0,0,0,0);
+body {
+	margin: 0 0;
+	font-family: Helvetica, Arial, Serif;
+	font-size: 15px;
+	line-height: 150%;
+	color: #333;
+	background-color: #000;
+	-webkit-tap-highlight-color: rgba(0,0,0,0);
+	-ms-tap-highlight-color: rgba(0,0,0,0);
 	tap-highlight-color: rgba(0,0,0,0);
-
-    -webkit-user-select: none;
+	-webkit-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
-	
 	outline: none;
 	-webkit-outline: none;
-
-    text-rendering: optimizeLegibility;
+	text-rendering: optimizeLegibility;
 }
 
-body.android
-{
-    text-rendering: auto !important;  // optimizeLegibility is messing up the way words wrap
+body.android {
+	text-rendering: auto !important; /* optimizeLegibility is messing up the way words wrap */
 }
 
-body.wince
-{
-    color: #FFF;
+
+body.wince {
+	color: #FFF;
 	background-color: #000;
 	font-family: "Segoe WP" !important;
 }
 
-div
-{
-  background-position: center center;
-  position: relative;
-  background-repeat: no-repeat;
-  background-size: contain;
-  height:100%;
-  -webkit-box-sizing:border-box;
-  box-sizing:border-box;
+div {
+	background-position: center center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+	position: relative;
 }
 
-.hidden
-{
-  display: none;
+
+.hidden {
+	display: none;
 }
 
-.container
-{
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: hidden;
-  -webkit-transform: translate3d(0,0,0);
+.container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	overflow: hidden;
+	-webkit-transform: translate3d(0,0,0);
 }
 
-.navigationBar
-{
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 45px;
-  
-  background-color: #333;
-  background-repeat: repeat-x;
-  
-  color: #FFF;
+.navigationBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 45px;
+	background-color: #333;
+	background-repeat: repeat-x;
+	color: #FFF;
+	text-align: center;
+	line-height: 44px;
+	font-size: 14pt;
+	-webkit-text-shadow: 0px -1px 0px #000;
+	text-shadow: 0px -1px 0px #000;
+}
+
+.android .navigationBar {
+	background-color: #333;
+	color: #FFF;
+	text-align: left;
+	line-height: 50px;
+}
+
+.android .navigationBar div:first-child {
+	left: 10px;
+}
+
+.wince .navigationBar {
+	text-align: left;
+	font-size: 32pt;
+	color: #FFF;
+	background-color: #000;
+	height: 70px;
+	padding: 10px;
+	text-shadow: none;
+	font-weight: 100;
+	font-family: "Segoe UI Light" !important;
+}
+
+.navigationBar div {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+	position: absolute;
+	left: 0px;
+	right: 0px;
+}
+
+.toolBar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 45px;
+	background-color: #333;
+	background-repeat: repeat-x;
   text-align: center;
-  line-height: 44px;
-  font-size: 14pt;
-  -webkit-text-shadow: 0px -1px 0px #000;
-  text-shadow: 0px -1px 0px #000;
+  line-height: 66px;
 }
 
-.android .navigationBar
-{
-    background-color: #333;
-    color: #FFF;
-    text-align: left;
-    line-height: 50px;
+.wince toolBar {
+	background-color: #000;
+	color: #FFF;
 }
 
-.android .navigationBar div:first-child
+.toolBar .icon
 {
-    left:10px;
-}
-
-.wince .navigationBar
-{
-  text-align: left;
-  font-size: 32pt;
-  color: #FFF;
-  background-color: #000;
-  height: 70px;
-  padding:10px;
-  text-shadow: none;
-  font-weight: 100;
-  font-family: "Segoe UI Light" !important;
-}
-
-.navigationBar div
-{
-    text-overflow:ellipsis;
-    overflow:hidden;
-    white-space:nowrap;
-    position:absolute;
-    left:0px;
-    right:0px;
-}
-
-.toolBar
-{
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 45px;
-  
-  background-color: #333;
-  background-repeat: repeat-x;
-}
-
-.wince toolBar
-{
-  background-color: #000;
-  color: #FFF;
-}
-
-.viewBackground
-{
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  
-  background-color: #888;
-}
-
-.content
-{
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: auto;
-  padding:10px;
-  color: #FFF;
-}
-
-.content.avoidNavigationBar
-{
-  top: 45px;
-}
-
-.wince .content.avoidNavigationBar
-{
-  top: 90px;
-}
-
-.content.avoidToolBar
-{
-  bottom: 45px;
-}
-
-.barButton
-{
-  position: absolute;
-  height: 27px;
-  top: 10px;
-  color: #FFF;
-  border:none;
-  border-radius: 5px;
-  background-color: rgba(0,0,0,0.25);
-  background-position: center center;
-  background-repeat: no-repeat;
-  font-size:10pt;
-  -webkit-box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75);
-  box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75);
-  -webkit-text-shadow: 0px -1px 0px #000;
-  text-shadow: 0px -1px 0px #000;
-  padding-left: 10px;
-  padding-right: 10px;
-  background-clip: border-box;
-}
-.android .barButton
-{
-  border-radius: 0px;
-  -webkit-box-shadow: none;
-  line-height: 22px;
-  border: 1px solid #888;
-  background-color: #AAA;
-  color: #333;
-}
-.wince .barButton
-{
-  border: 2px solid #FFF;
-  -ms-border-radius: 0 !important;
-  border-radius: 0 !important;
-  background-color: #000;
-  line-height:20px;
-  -ms-box-shadow: none;
-  box-shadow: none;
-  text-shadow: none;
-  color:#FFF !important;
-}
-
-.barButton.touched
-{
-  -webkit-box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75), 0px 0px 50px rgba(0,0,0,0.375) inset;
-  box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75), 0px 0px 50px rgba(0,0,0,0.375) inset;
-  padding-top:1px;
-}
-
-.android .barButton.touched
-{
-  -webkit-box-shadow:none;
-  background-color: rgba(255,255,255,0.25);
-}
-
-.wince .barButton.touched
-{
-  background-color: #FFF;
-  color: #000;
-}
-
-.android .backButton
-{
-  display: none;
-}
-
-.wince .backButton
-{
-  display: none;
-}
-
-.destructive
-{
-    background-color: #800;
-}
-.cancel
-{
-    background-color: #333;
-}
-.go
-{
-    background-color: #080;
+  margin-left: 8px;
+  margin-right: 8px;
 }
 
 
-.pkui-alert-container
-{
-    position: absolute;
-    background-color: rgba(0,0,0,0.5);
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    opacity: 0;
-    -webkit-transition: opacity 0.25s ease-in-out;
-	z-index:999999;
+.viewBackground {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	background-color: #888;
 }
 
-.pkui-alert
-{
-    position: absolute;
-    top: 35%;
-    left: 10%;
-    right: 10%;
-    bottom: 35%;
-    height: 30%;
-    width:80%;
-    background-color: rgba(32, 64, 128, 0.75);
-    border: 2px solid rgba(255,255,255, 0.75);
-    border-radius: 10px;
-    margin: 0;
-    text-align: center;
-    opacity: 0;
-    -webkit-transition: -webkit-transform 0.125s ease-in-out, opacity 0.25s ease-in-out,
-                        top 0.25s ease-in-out, left 0.25s ease-in-out,
-                        right 0.25s ease-in-out, bottom 0.25s ease-in-out,
-                        width 0.25s ease-in-out, height 0.25s ease-in-out;
-    -webkit-transform: scale3d(1,1,1);
-    box-shadow: 0px 20px 12px rgba(255,255,255,0.125) inset ,0px 0px 20px #000;
-    min-height: 125px;
+.content {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: auto;
+	padding: 10px;
+	color: #FFF;
 }
 
-.android .pkui-alert
-{
-  border-radius: 0px;
-  border: 2px solid #FFF;
-  background-color: #333;  
-}
-.landscape .pkui-alert
-{
-    left: 20%;
-    right: 20%;
-    width: 60%;
-    top: 30%;
-    bottom: 30%;
-    height: 40%;
-}
-.ios.tablet.portrait .pkui-alert
-{
-  left:30%;
-  right:30%;
-  width:40%;
-  top:40%;
-  bottom:40%;
-  height:20%;
-}
-.ios.tablet.landscape .pkui-alert
-{
-  left:30%;
-  right:30%;
-  width:40%;
-  top:40%;
-  bottom:40%;
-  height:20%;
+.content.avoidNavigationBar {
+	top: 45px;
 }
 
-.wince .pkui-alert
-{
-    top: 0;
+.wince .content.avoidNavigationBar {
+	top: 90px;
+}
+
+.content.avoidToolBar {
+	bottom: 45px;
+}
+
+.barButton {
+	position: absolute;
+	height: 27px;
+	top: 10px;
+	color: #FFF;
+	border: none;
+	border-radius: 5px;
+	background-color: rgba(0,0,0,0.25);
+	background-position: center center;
+	background-repeat: no-repeat;
+	font-size: 10pt;
+	-webkit-box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75);
+	box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75);
+	-webkit-text-shadow: 0px -1px 0px #000;
+	text-shadow: 0px -1px 0px #000;
+	padding-left: 10px;
+	padding-right: 10px;
+	background-clip: border-box;
+}
+.android .barButton {
+	border-radius: 0px;
+	-webkit-box-shadow: none;
+	line-height: 22px;
+	border: 1px solid #888;
+	background-color: #AAA;
+	color: #333;
+}
+.wince .barButton {
+	border: 2px solid #FFF;
+	-ms-border-radius: 0 !important;
+	border-radius: 0 !important;
+	background-color: #000;
+	line-height: 20px;
+	-ms-box-shadow: none;
+	box-shadow: none;
+	text-shadow: none;
+	color: #FFF !important;
+}
+
+.barButton.touched {
+	-webkit-box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75), 0px 0px 50px rgba(0,0,0,0.375) inset;
+	box-shadow: 0px 0px 1px rgba(255,255,255,0.5), 0px -1px 1px rgba(0,0,0,0.75), 0px 0px 1px rgba(0,0,0,1), 0px 0px 1px rgba(0,0,0,1), 0px 1px 1px rgba(255,255,255,0.75), 0px 0px 50px rgba(0,0,0,0.375) inset;
+	padding-top: 1px;
+}
+
+.android .barButton.touched {
+	-webkit-box-shadow: none;
+	background-color: rgba(255,255,255,0.25);
+}
+
+.wince .barButton.touched {
+	background-color: #FFF;
+	color: #000;
+}
+
+.android .backButton {
+	display: none;
+}
+
+.wince .backButton {
+	display: none;
+}
+
+.ios .destructive {
+	background-color: #800 !important;
+	color: #FFF !important;
+	-webkit-text-shadow: 0px -1px 0px #000 !important;
+	text-shadow: 0px -1px 0px #000 !important;
+}
+.ios .cancel {
+	background-color: #333 !important;
+	color: #FFF !important;
+	-webkit-text-shadow: 0px -1px 0px #000 !important;
+	text-shadow: 0px -1px 0px #000 !important;
+}
+.ios .go {
+	background-color: #080 !important;
+	color: #FFF !important;
+	-webkit-text-shadow: 0px -1px 0px #000 !important;
+	text-shadow: 0px -1px 0px #000 !important;
+}
+
+.pkui-alert-container {
+	position: absolute;
+	background-color: rgba(0,0,0,0.5);
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	opacity: 0;
+	-webkit-transition: opacity 0.25s ease-in-out;
+	z-index: 999999;
+}
+
+.pkui-alert {
+	position: relative;
+	top: 30%;
+	height: auto;
+	width: 80%;
+	margin: auto auto;
+	background-color: rgba(32, 64, 128, 0.75);
+	border: 2px solid rgba(255,255,255, 0.75);
+	border-radius: 10px;
+	text-align: center;
+	opacity: 0;
+	-webkit-transition: -webkit-transform 0.125s ease-in-out, opacity 0.25s ease-in-out, top 0.25s ease-in-out, left 0.25s ease-in-out, right 0.25s ease-in-out, bottom 0.25s ease-in-out, width 0.25s ease-in-out, height 0.25s ease-in-out;
+	-webkit-transform: scale3d(1,1,1);
+	box-shadow: 0px 20px 12px rgba(255,255,255,0.125) inset, 0px 0px 20px #000;
+}
+
+.android .pkui-alert {
+	border-radius: 0px;
+	border: 2px solid #FFF;
+	background-color: #333;
+}
+.landscape .pkui-alert {
+	width: 60%;
+	top: 20%;
+}
+.ios.tablet.portrait .pkui-alert {
+	width: 40%;
+	top: 40%;
+}
+.ios.tablet.landscape .pkui-alert {
+	width: 40%;
+	top: 40%;
+}
+
+.wince .pkui-alert {
+	position: absolute;
+	top: 0;
 	left: 0;
 	right: 0;
 	width: 100%;
 	height: 40%;
 	border-radius: 0px;
-	box-shadow: 0px 0px 10px #000; 
+	box-shadow: 0px 0px 10px #000;
 	border: none;
 	background-color: #333;
 	color: #FFF;
 }
 
-.wince .landscape .pkui-alert
-{
-    top: 0;
+.wince .landscape .pkui-alert {
+	top: 0;
 	left: 0;
 	right: 0;
 	height: 40%;
 }
 
-
-.pkui-alert.pkui-prompt
-{
-    top:30%;
-    bottom:30%;
-    height: 40%;
-    min-height: 200px;
+.landscape .pkui-alert.pkui-prompt {
+	top: 20%;
 }
 
-.landscape .pkui-alert.pkui-prompt
-{
-    top: 20%;
-    bottom: 20%;
-    height: 60%;
+.ios.tablet.portrait .pkui-alert.pkui-prompt {
+	width: 40%;
+	top: 40%;
+}
+.ios.tablet.landscape .pkui-alert.pkui-prompt {
+	width: 40%;
+	top: 40%;
 }
 
-.ios.tablet.portrait .pkui-alert.pkui-prompt
-{
-  left:30%;
-  right:30%;
-  width:40%;
-  top:40%;
-  bottom:40%;
-  height:20%;
-}
-.ios.tablet.landscape .pkui-alert.pkui-prompt
-{
-  left:30%;
-  right:30%;
-  width:40%;
-  top:40%;
-  bottom:40%;
-  height:20%;
-}
-
-.wince .pkui-alert.pkui-prompt
-{
-    top:0;
+.wince .pkui-alert.pkui-prompt {
+	top: 0;
 	bottom: auto;
 	height: 40%;
 }
 
-.wince .landscape .pkui-alert.pkui-prompt
-{
-    top: 0;
+.wince .landscape .pkui-alert.pkui-prompt {
+	top: 0;
 	bottom: auto;
 	height: 60%;
 }
 
-
-.pkui-alert-title
-{
-    position: relative;
-    font-size: 12pt;
-    line-height: 1em;
-    height: auto;
-    font-weight: bold;
-    margin-bottom: 1em;
-    margin-top: 10px;
-    color: #FFF;
-    -webkit-text-shadow: 0px -1px 0px #000;
-    text-shadow: 0px -1px 0px #000;
+.pkui-alert-title {
+	position: relative;
+	font-size: 12pt;
+	line-height: 1em;
+	height: auto;
+	font-weight: bold;
+	margin-bottom: 1em;
+	margin-top: 10px;
+	color: #FFF;
+	-webkit-text-shadow: 0px -1px 0px #000;
+	text-shadow: 0px -1px 0px #000;
 }
 
-.wince .pkui-alert-title
-{
-    text-align: left;
+.wince .pkui-alert-title {
+	text-align: left;
 	padding-left: 10px;
 }
 
-.pkui-alert-message
-{
-    position: relative;
-    line-height: 1em;
-    height: auto;
-    font-size: 10pt;
-    font-weight: normal;
-    color: #FFF;
-    margin-left:10px;
-    margin-right:10px;
-    -webkit-text-shadow: 0px -1px 0px #000;
-    text-shadow: 0px -1px 0px #000;
+.pkui-alert-message {
+	position: relative;
+	line-height: 1em;
+	height: auto;
+	font-size: 10pt;
+	font-weight: normal;
+	color: #FFF;
+	margin-left: 10px;
+	margin-right: 10px;
+	-webkit-text-shadow: 0px -1px 0px #000;
+	text-shadow: 0px -1px 0px #000;
 }
 
-.wince .pkui-alert-message
-{
-    text-align: left;
+.wince .pkui-alert-message {
+	text-align: left;
 }
 
-.pkui-prompt-input
-{
-    position: absolute;
-    line-height: 1em;
-    height: 1.5em;
-    font-size:12pt;
-    font-weight: normal;
-    width: 80%;
-    left: 10%;
-    right: 10%;
-    padding: 0;
-    margin: 0;
-    bottom: 60px;
-    color: #333;
-    border-radius: 5px;
-    border: 1px solid rgba(0,0,0,0.75);
-    -webkit-box-shadow: 0px 3px 6px rgba(0,0,0,0.25) inset;
-    box-shadow: 0px 3px 6px rgba(0,0,0,0.25) inset;
-    background-color: #FFF;
-    -webkit-appearance: none;
+.pkui-prompt-input {
+	position: static;
+	line-height: 1em;
+	height: 1.5em;
+	font-size: 12pt;
+	font-weight: normal;
+	width: 80%;
+	padding: 0;
+	margin: 0;
+	margin-top: 1em;
+	bottom: 60px;
+	color: #333;
+	border-radius: 5px;
+	border: 1px solid rgba(0,0,0,0.75);
+	-webkit-box-shadow: 0px 3px 6px rgba(0,0,0,0.25) inset;
+	box-shadow: 0px 3px 6px rgba(0,0,0,0.25) inset;
+	background-color: #FFF;
+	-webkit-appearance: none;
 }
 
-.android .pkui-prompt-input
-{
-    box-shadow: none;
-    -webkit-box-shadow: none;
-    border-radius: 0px;
-}
-
-.wince .pkui-prompt-input
-{
-    box-shadow: none;
+.android .pkui-prompt-input {
+	box-shadow: none;
+	-webkit-box-shadow: none;
 	border-radius: 0px;
-
 }
 
-.pkui-alert-action-container
-{
-    position: absolute;
-    line-height: 1em;
-    height: auto;
-    font-size: 16pt;
-    font-weight: normal;
-    color: #FFF;
-    bottom:20px;
-    width: 100%;
+.wince .pkui-prompt-input {
+	box-shadow: none;
+	border-radius: 0px;
 }
 
-.android .pkui-alert-action-container
-{
-    bottom:0px;
-    background-color: #333;
-    -webkit-box-shadow: 0px 1em 1px rgba(255,255,255,0.25) inset;
-    line-height: 2em;
+.pkui-alert-action-container {
+	position: relative;
+	line-height: 1em;
+	height: auto;
+	font-size: 16pt;
+	font-weight: normal;
+	color: #FFF;
+	margin-bottom: 20px;
+	width: 100%;
 }
 
-.wince .pkui-alert-action-container
-{
-    text-align: right;
+.android .pkui-alert-action-container {
+	bottom: 0px;
+	background-color: #333;
+	-webkit-box-shadow: 0px 1em 1px rgba(255,255,255,0.25) inset;
+	line-height: 1em;
+  margin-top:1em;
+}
+
+.wince .pkui-alert-action-container {
+	text-align: right;
 	padding-right: 8px;
 }
 
-.pkui-alert-action-container .barButton
-{
-    position: relative;
-    display: inline-block;
-    margin-right:5px;
-    margin-left: 5px;
-    -webkit-box-shadow: 0px 13px 1px rgba(255,255,255,0.25) inset;
-    box-shadow: 0px 13px 1px rgba(255,255,255,0.25) inset;
-    border: 1px solid rgba(0,0,0,0.5);
-    background-clip: padding-box;
-    padding-left: 20px;
-    padding-right: 20px;
+.pkui-alert-action-container .barButton {
+	position: relative;
+	display: inline-block;
+	margin-right: 5px;
+	margin-left: 5px;
+	-webkit-box-shadow: 0px 18px 1px rgba(255,255,255,0.25) inset;
+	box-shadow: 0px 18px 1px rgba(255,255,255,0.25) inset;
+	border: 1px solid rgba(0,0,0,0.5);
+	background-clip: padding-box;
+	padding-left: 20px;
+	padding-right: 20px;
+  height:37px;
 }
 
-.android .pkui-alert-action-container .barButton
-{
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    border: 1px solid #888;
-    top: -0.2em;
+.pkui-alert-action-container .wideButton {
+	display: block;
+	margin-left: 5%;
+	margin-right: 5%;
+	width: 90%;
+	margin-bottom: 5px;
 }
 
-.wince .pkui-alert-action-container .barButton
-{
-    -webkit-box-shadow: none;
+.ios .wideButton {
+	font-weight: bold;
+	background-color: #CCC;
+	color: #333;
+	-webkit-text-shadow: none;
+	text-shadow: none;
+}
+
+.android .pkui-alert-action-container .barButton {
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	border: 1px solid #888;
+	ztop: -0.2em;
+  height: 27px;
+}
+
+.wince .pkui-alert-action-container .barButton {
+	-webkit-box-shadow: none;
 	box-shadow: none;
 	border: 2px solid #FFF;
 	background-color: #000;
+  height: 27px;
 }
 
-.pkui-alert-action-container .barButton.touched
-{
-    -webkit-box-shadow: 0px -11px 1px rgba(255,255,255,0.25) inset;
-    box-shadow: 0px -11px 1px rgba(255,255,255,0.25) inset;
-    padding-top: 1px;
+.pkui-alert-action-container .barButton.touched {
+	-webkit-box-shadow: 0px -18px 1px rgba(255,255,255,0.25) inset;
+	box-shadow: 0px -18px 1px rgba(255,255,255,0.25) inset;
 }
 
-.android .pkui-alert-action-container .barButton.touched
-{
-    -webkit-box-shadow: none;
-    box-shadow: 0px;
-    padding-top: 0px;
-    line-height: 27px;
-    background-color: #888;
-    color: #FFF;
+.android .pkui-alert-action-container .barButton.touched {
+	-webkit-box-shadow: none;
+	box-shadow: 0px;
+	padding-top: 0px;
+	line-height: 27px;
+  height: 27px;
+	background-color: #888;
+	color: #FFF;
 }
 
-.wince .pkui-alert-action-container .barButton.touched
-{
-    -webkit-box-shadow: none;
-    box-shadow: 0px;
-    padding-top: 0px;
-    background-color: #888;
-    color: #FFF;
+.wince .pkui-alert-action-container .barButton.touched {
+	-webkit-box-shadow: none;
+	box-shadow: 0px;
+	padding-top: 0px;
+	background-color: #888;
+	color: #FFF;
+  height: 27px;
 }
 
-.input, .textarea
+.input, .textarea {
+	display: block;
+}
+
+
+.preventClicks
 {
-    display: block;
+  position: absolute;
+  z-index: 999999;
+  background-color: transparent;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  -webkit-transform: translate3d(0,0,0);
 }
