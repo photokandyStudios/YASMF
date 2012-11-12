@@ -1,4 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
 /******************************************************************************
  *
  * UTILITY
@@ -7,6 +6,25 @@
  * This library includes simple utility functions
  *
  ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global PKLOC, device, cordova */
 
 var PKUTIL = PKUTIL ||
 {
@@ -156,7 +174,7 @@ PKUTIL._load = function(theFileName, aSync, completion)
   {
     if (r.readyState == 4)// loaded
     {
-      if (r.status == 200 || r.status == 0)// success
+      if (r.status == 200 || r.status === 0)// success
       {
         if (completion)
         {
@@ -199,7 +217,7 @@ PKUTIL._load = function(theFileName, aSync, completion)
 PKUTIL.include = function(theScripts, completion)
 {
   var theNewScripts = theScripts;
-  if (theNewScripts.length == 0)
+  if (theNewScripts.length === 0)
   {
     if (completion)
     {
@@ -343,7 +361,7 @@ PKUTIL.loadJSON = function(theURL, completion)
       } catch (err)
       {
         console.log("Failed to parse JSON from " + theURL);
-        success = COMPLETION_FAILURE;
+        success = PKUTIL.COMPLETION_FAILURE;
       }
     }
     // call completion, if available
@@ -373,7 +391,7 @@ PKUTIL.showURL = function(theURL)
         url : theURL,
         geolocationEnabled : false
       };
-      Cordova.exec(null, null, "ChildBrowserCommand", "showWebPage", options);
+      cordova.exec(null, null, "ChildBrowserCommand", "showWebPage", options);
       break;
     default:
       // iOS
@@ -390,7 +408,7 @@ PKUTIL.showURL = function(theURL)
 
 PKUTIL.instanceOfTemplate = function(templateElement, replacements)
 {
-  var templateHTML = templateElement.innerHTML;
+  var templateHTML = templateElement.innerHTML || templateElement;
   for (var theVar in replacements)
   {
     while (templateHTML.indexOf('%' + theVar.toUpperCase() + '%') > -1)
@@ -480,6 +498,10 @@ PKUTIL.getGUID = function() {
     return uuid;
 }
 
+PKUTIL.getUnixTime = function ()
+{
+  return (new Date()).getTime();
+}
 
 
 
