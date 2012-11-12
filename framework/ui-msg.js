@@ -1,8 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
-// REQUIRES: utility.js
-// REQUIRES: device.js
-// REQUIRES: ui-core.js
-
 /******************************************************************************
  *
  * UI-MSG
@@ -12,7 +7,26 @@
  * can be displayed to the end user.
  *
  ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
 
+/*global PKUTIL, device, PKDEVICE, __T */
 var PKUI = PKUI ||
 {
 };
@@ -21,7 +35,11 @@ var PKUI = PKUI ||
 PKUI.MESSAGE = PKUI.MESSAGE ||
 {
 };
-// create the CORE space
+
+PKUI.MESSAGE.messageStack = [];
+PKUI.MESSAGE.currentMessage = null;
+
+PKUI.MESSAGE.captureBackButton = false;
 
 PKUI.MESSAGE.createBaseElements = function(title, text)
 {
@@ -104,14 +122,23 @@ PKUI.MESSAGE.Confirm = function(title, text, buttons, dismissFn)
     self.actionElement.appendChild(theButtonElement);
   }
 
+  self.hide = function()
+  {
+    self.dismiss(-1);
+  }
   self.backButtonPressed = function()
   {
     self.dismiss(-1);
   }
   self.show = function()
   {
-    // capture the backbutton
-    document.addEventListener("backbutton", self.backButtonPressed, false);
+    PKUI.MESSAGE.currentMessage = self;
+    PKUI.MESSAGE.messageStack.push (self);
+    if (PKUI.MESSAGE.captureBackButton)
+    {
+      // capture the backbutton
+      document.addEventListener("backbutton", self.backButtonPressed, false);
+    }
 
     document.body.appendChild(self.rootElement);
 
@@ -146,7 +173,25 @@ PKUI.MESSAGE.Confirm = function(title, text, buttons, dismissFn)
 
   self.dismiss = function(idx)
   {
-    document.removeEventListener("backbutton", self.backButtonPressed);
+      if (window.event) { PKUI.CORE.cancelEvent(); }
+
+    if (PKUI.MESSAGE.captureBackButton)
+    {
+      document.removeEventListener("backbutton", self.backButtonPressed);
+    }
+
+    PKUI.MESSAGE.messageStack.pop(); // pop us.
+    if (PKUI.MESSAGE.messageStack.length>0)
+    { // keep the message stack maintained
+      PKUI.MESSAGE.currentMessage = PKUI.MESSAGE.messageStack.pop();
+      PKUI.MESSAGE.messageStack.push( PKUI.MESSAGE.currentMessage );
+    }
+    else
+    {
+      PKUI.MESSAGE.currentMessage = null; // no messages on the stack.
+    }
+    
+
     if (PKUI.CORE.useTransforms)
     {
       self.alertElement.style.opacity = "0";
