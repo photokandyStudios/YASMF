@@ -1,4 +1,3 @@
-/*jshint asi:true, forin:true, noarg:true, noempty:true, eqeqeq:false, bitwise:true, undef:true, curly:true, browser:true, devel:true, smarttabs:true, maxerr:50 */
 /******************************************************************************
  *
  * FILEUTIL
@@ -48,6 +47,26 @@
  *
  *
  ******************************************************************************/
+
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global LocalFileSystem, PKUTIL, FileEntry, DirectoryEntry*/
 
 var PKFILE = PKFILE ||
 {
