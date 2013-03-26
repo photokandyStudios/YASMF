@@ -51,6 +51,10 @@ PKDEVICE.platform = function()
     return PKDEVICE.platformOverride.toLowerCase();
   }
   var thePlatform = device.platform.toLowerCase();
+  //
+  // turns out that for Cordova > 2.3, deivceplatform now returns iOS, so the
+  // following is really not necessary on those versions. We leave it here
+  // for those using Cordova <= 2.2.
   if (thePlatform.indexOf("ipad") > -1 || thePlatform.indexOf("iphone") > -1)
   {
     thePlatform = "ios";
