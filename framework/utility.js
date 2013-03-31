@@ -24,22 +24,83 @@
          white:false,
          onevar:false 
  */
-/*global PKLOC, device, cordova */
-
+/*global PKLOC, device, cordova, console */
+/*requires: cordova.js*/
 var PKUTIL = PKUTIL ||
 {
 };
 // create the namespace
+PKUTIL.version = { major: 0, minor: 3, rev: 100 };
 
 //
 // Properties
 //
+PKUTIL.consoleLogging = false; // add console logging flag, v0.3.100
 PKUTIL.COMPLETION_SUCCESS = true;
 PKUTIL.COMPLETION_FAILURE = false;
 
 //
 // Methods
 //
+
+/**
+ *
+ * Checks to see if the dependency has already been loaded.
+ *
+ */
+PKUTIL._dependencies = [];
+PKUTIL.export = function ( dependency )
+{
+  if (dependency.push)
+  {
+    // probably an array; use it as such
+    for (var i=0; i<dependency.length; i++)
+    {
+      PKUTIL._dependencies.push ( dependency[i] );
+    }
+  }
+  else
+  {
+    PKUTIL._dependencies.push ( dependency );
+  }
+}
+PKUTIL.require = function ( dependency, completion )
+{
+  if (!dependency)
+  {
+    return true;
+  }
+  var allRequires;
+  if (dependency.push)
+  {
+    allRequires = dependency;
+  }
+  else
+  {
+    allRequires = [ dependency ];
+  }
+  var allDepenciesMet = true;
+  for (var i=0; i<allRequires.length; i++)
+  {
+    var dependencyMet = PKUTIL._dependencies.indexOf ( allRequires[i] ) > -1;
+    if (!dependencyMet)
+    {
+      if (PKUTIL.consoleLogging) { console.log ("[WARN] Dependency " + allRequires[i] + " not met."); }
+      throw "Dependency Failure";
+    }
+    allDepenciesMet = allDepenciesMet && dependencyMet; 
+  }
+  if (allDepenciesMet)
+  {
+    if (completion)
+    {
+      completion();
+    }
+  }
+  return allDepenciesMet;
+}
+PKUTIL.export ( "PKUTIL" );
+PKUTIL.require ( null );
 
 /**
  *
@@ -125,15 +186,20 @@ PKUTIL.XHRTimer = -1;
 
 PKUTIL.load = function(theFileName, aSync, completion)
 {
+  // if we're running on anything but Windows Phone, we call
+  // _load directly, since it does the right thing.
   if (device.platform != "WinCE")
   {
     PKUTIL._load(theFileName, aSync, completion);
     return;
   }
-  console.log("Pushing request to load XHR: " + theFileName);
+
+  // but if we re running on Windows Phone, we need to queue
+  // the requests so that we can process them in order.
+  if (PKUTIL.consoleLogging) { console.log("Pushing request to load XHR: " + theFileName); }
   PKUTIL.loadQueue.push(function()
   {
-    console.log("Processing XHR " + theFileName);
+    if (PKUTIL.consoleLogging) { console.log("Processing XHR " + theFileName); }
     PKUTIL._load(theFileName, aSync, completion);
   });
 
@@ -178,7 +244,8 @@ PKUTIL._load = function(theFileName, aSync, completion)
       {
         if (completion)
         {
-          console.log("success loading " + theFileName + ", length " + r.responseText.length);
+          if (PKUTIL.consoleLogging) 
+            { console.log("success loading " + theFileName + ", length " + r.responseText.length); }
           completion(PKUTIL.COMPLETION_SUCCESS, r.responseText);
           PKUTIL.XHRinProgress = false;
         }
@@ -238,7 +305,8 @@ PKUTIL.include = function(theScripts, completion)
       // add it as a script tag
     } else
     {
-      console.log("WARNING: Failed to load " + theScriptName);
+      if (PKUTIL.consoleLogging) 
+        { console.log("WARNING: Failed to load " + theScriptName); }
     }
     PKUTIL.include(theNewScripts, completion);
   });
@@ -319,7 +387,7 @@ PKUTIL.loadHTML = function(theFileName, options, completion)
           document.body.appendChild(theScriptElement);
         } catch ( err )
         {
-          console.log("When loading " + theFileName + ", error: " + err);
+          if (PKUTIL.consoleLogging) { console.log("When loading " + theFileName + ", error: " + err); }
         }
       }
       if (completion)
@@ -328,7 +396,7 @@ PKUTIL.loadHTML = function(theFileName, options, completion)
       }
     } else
     {
-      console.log("WARNING: Failed to load " + theFileName);
+      if (PKUTIL.consoleLogging) { console.log("WARNING: Failed to load " + theFileName); }
       if (completion)
       {
         completion(PKUTIL.COMPLETION_FAILURE);
@@ -360,7 +428,7 @@ PKUTIL.loadJSON = function(theURL, completion)
         theParsedData = JSON.parse(data);
       } catch (err)
       {
-        console.log("Failed to parse JSON from " + theURL);
+        if (PKUTIL.consoleLogging) { console.log("Failed to parse JSON from " + theURL); }
         success = PKUTIL.COMPLETION_FAILURE;
       }
     }
@@ -373,29 +441,36 @@ PKUTIL.loadJSON = function(theURL, completion)
 }
 /**
  *
- * Shows an instance of the ChildBrowser plugin with the given URL
- * regardless of the platform we're running on. The plugin must
- * be properly installed, or the function will not work.
+ * Loads a URL in a popup window. Uses ChildBrowser for PG 2.2.x or
+ * lower, and in-app browser for 2.3 or higher.
  *
  */
 PKUTIL.showURL = function(theURL)
 {
-  switch (device.platform)
+  if (device.cordova < 2.3)
   {
-    case "Android":
-      window.plugins.childBrowser.showWebPage(theURL);
-      break;
-    case "WinCE":
-      var options =
-      {
-        url : theURL,
-        geolocationEnabled : false
-      };
-      cordova.exec(null, null, "ChildBrowserCommand", "showWebPage", options);
-      break;
-    default:
-      // iOS
-      cordova.exec("ChildBrowserCommand.showWebPage", theURL);
+    switch (device.platform)
+    {
+      case "Android":
+        window.plugins.childBrowser.showWebPage(theURL);
+        break;
+      case "WinCE":
+        var options =
+        {
+          url : theURL,
+          geolocationEnabled : false
+        };
+        cordova.exec(null, null, "ChildBrowserCommand", "showWebPage", options);
+        break;
+      default:
+        // iOS
+        cordova.exec("ChildBrowserCommand.showWebPage", theURL);
+    }
+  }
+  else
+  {
+    // use in-app browser instead
+    window.open ( theURL, '_blank' );
   }
 }
 /**
@@ -423,6 +498,7 @@ PKUTIL.instanceOfTemplate = function(templateElement, replacements)
  * Filename Handling
  *
  */
+PKUTIL.export ( "PKUTIL.FILE" );
 PKUTIL.FILE = PKUTIL.FILE ||
 {
 };
