@@ -25,8 +25,14 @@
          white:false,
          onevar:false 
  */
+/*global PKUTIL, PKDEVICE */
+PKUTIL.require ( ["PKUTIL", "PKDEVICE"], function () 
+{ 
+    PKUTIL.export ( [ "UI", "UI.COLOR", "UI.FONT", "UI.SHADOW" ] );
+});
 
 var UI = UI || {};
+UI.version = { major: 0, minor: 3, rev: 100 };
 
 /**
  *
@@ -164,3 +170,167 @@ UI.zeroRect = function () { return UI.makeRect ( UI.zeroPoint(), UI.zeroSize() )
 UI.screenSize = function () { return UI.makeSize ( window.innerWidth, window.innerHeight ); };
 UI.screenBounds = function () { return UI.makeRect ( UI.zeroPoint(), UI.screenSize() ); };
 
+/**
+ *
+ * fonts
+ *
+ */
+
+UI.makeFont = function ( theFontFamily, theFontSize, theFontWeight )
+{
+  return { family: theFontFamily,
+             size: theFontSize,
+           weight: theFontWeight || "normal"
+         };
+}
+UI.copyFont = function ( theFont )
+{
+  return UI.makeFont ( theFont.family, theFont.size, theFont.weight );
+}
+UI.copyFontWithNewSize = function ( theFont, theNewSize )
+{
+  return UI.makeFont ( theFont.family, theNewSize, theFont.weight );
+}
+UI.copyFontWithNewSizeDelta = function ( theFont, theNewSizeDelta )
+{
+  return UI.makeFont ( theFont.family, theFont.size + theNewSizeDelta, theFont.weight );
+}
+UI.copyFontWithPercentSize = function ( theFont, theSizePercent )
+{
+  return UI.makeFont ( theFont.family, theFont.size * theSizePercent, theFont.weight );
+}
+UI._applyFontToElement = function ( theElement, theFont )
+{
+  if (theFont)
+  {
+    theElement.style.fontFamily = theFont.family;
+    theElement.style.fontSize = "" + theFont.size + "px";
+    theElement.style.fontWeight = theFont.weight;
+  }
+  else
+  {
+    theElement.style.fontFamily = "inherit";
+    theElement.style.fontSize = "inherit";
+    theElement.style.fontWeight = "inherit";
+  }
+}
+
+UI.FONT = UI.FONT || {};
+UI.FONT.systemFont = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case "ios": return UI.makeFont ( "Helvetica, Arial, sans-serif", 20, "normal" );
+    case "android": return UI.makeFont ( "Roboto, Arial, sans-serif", 20, "normal" );
+    case "wince": return UI.makeFont ( "Segoe, Arial, sans-serif", 20, "normal" );
+    default: return UI.makeFont ( "sans-serif", 20, "normal" );
+  }
+}
+UI.FONT.boldSystemFont = function ()
+{
+  var theSystemFont = UI.copyFont( UI.FONT.systemFont() );
+  theSystemFont.weight = "bold";
+  return theSystemFont;
+}
+
+/**
+ *
+ * Shadows
+ *
+ */
+UI.makeShadow = function ( theVisibility, theColor, theOffset, theBlur )
+{
+  return { visible: theVisibility, color: UI.copyColor(theColor), offset: UI.copyPoint ( theOffset ), blur: theBlur || 0 };
+}
+UI.copyShadow = function ( theShadow )
+{
+  return UI.makeShadow ( theShadow.visible, theShadow.color, theShadow.offset, theShadow.blur );
+}
+UI._applyShadowToElement = function ( theElement, theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      theElement.style.textShadow = "" + theShadow.offset.x + "px " +
+                                         theShadow.offset.y + "px " +
+                                         theShadow.blur + "px " +
+                                         UI._colorToRGBA(theShadow.color) + "";
+    }
+    else
+    {
+      theElement.style.textShadow = "inherit";
+    }
+  }
+  else
+  {
+    theElement.style.textShadow = "inherit";
+  }    
+}
+UI.SHADOW = UI.SHADOW || {};
+UI.SHADOW.defaultDarkShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case "ios": return UI.makeShadow ( true, "rgba(0,0,0,0.25)", UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, "#000", UI.zeroPoint(), 0 );
+  }
+}
+UI.SHADOW.defaultLightShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case "ios": return UI.makeShadow ( true, "rgba(255,255,255,0.75)", UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, "#FFF", UI.zeroPoint(), 0 );
+  }
+}
+
+/**
+ *
+ * Colors
+ *
+ */
+UI._colorToRGBA = function ( theColor )
+{
+  if (!theColor)
+  {
+    return "inherit";
+  }
+  if (theColor.alpha !== 0)
+  {
+    return "rgba(" + theColor.red + "," + theColor.green + "," + theColor.blue + "," + theColor.alpha + ")";
+  }
+  else
+  {
+    return "transparent";
+  }
+}
+UI.makeColor = function ( r, g, b, a )
+{
+  return { red: r, green: g, blue: b, alpha: a };
+}
+UI.copyColor = function (theColor)
+{
+  return UI.makeColor ( theColor.red, theColor.green, theColor.blue, theColor.alpha );
+}
+UI.COLOR = UI.COLOR || {};
+UI.COLOR.blackColor     = function () { return UI.makeColor (   0,   0,   0, 1.0 ); }
+UI.COLOR.darkGrayColor  = function () { return UI.makeColor (  85,  85,  85, 1.0 ); }
+UI.COLOR.GrayColor      = function () { return UI.makeColor ( 127, 127, 127, 1.0 ); }
+UI.COLOR.lightGrayColor = function () { return UI.makeColor ( 170, 170, 170, 1.0 ); }
+UI.COLOR.whiteColor     = function () { return UI.makeColor ( 255, 255, 255, 1.0 ); }
+UI.COLOR.blueColor      = function () { return UI.makeColor (   0,   0, 255, 1.0 ); }
+UI.COLOR.greenColor     = function () { return UI.makeColor (   0, 255,   0, 1.0 ); }
+UI.COLOR.redColor       = function () { return UI.makeColor ( 255,   0,   0, 1.0 ); }
+UI.COLOR.cyanColor      = function () { return UI.makeColor (   0, 255, 255, 1.0 ); }
+UI.COLOR.yellowColor    = function () { return UI.makeColor ( 255, 255,   0, 1.0 ); }
+UI.COLOR.magentaColor   = function () { return UI.makeColor ( 255,   0, 255, 1.0 ); }
+UI.COLOR.orangeColor    = function () { return UI.makeColor ( 255, 127,   0, 1.0 ); }
+UI.COLOR.purpleColor    = function () { return UI.makeColor ( 127,   0, 127, 1.0 ); }
+UI.COLOR.brownColor     = function () { return UI.makeColor ( 153, 102,  51, 1.0 ); }
+UI.COLOR.lightTextColor = function () { return UI.makeColor ( 240, 240, 240, 1.0 ); }
+UI.COLOR.darkTextColor  = function () { return UI.makeColor (  15,  15,  15, 1.0 ); }
+UI.COLOR.clearColor     = function () { return UI.makeColor (   0,   0,   0, 0.0 ); }
