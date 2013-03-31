@@ -26,13 +26,14 @@
          white:false,
          onevar:false 
  */
-/*global device */
+/*global device, PKUTIL */
+if (PKUTIL) { if (PKUTIL.export) { PKUTIL.export ( "PKDEVICE" ); } }
 
 var PKDEVICE = PKDEVICE ||
 {
 };
 // create the namespace
-
+PKDEVICE.version = { major: 0, minor: 3, rev: 100 };
 PKDEVICE.platformOverride = false;
 // change me for testing in a browser...
 PKDEVICE.formFactorOverride = false;
@@ -49,6 +50,14 @@ PKDEVICE.platform = function()
   if (PKDEVICE.platformOverride)
   {
     return PKDEVICE.platformOverride.toLowerCase();
+  }
+  if (!device)
+  {
+    return "unknown";
+  }
+  if (!device.platform)
+  {
+    return "unknown";
   }
   var thePlatform = device.platform.toLowerCase();
   //
