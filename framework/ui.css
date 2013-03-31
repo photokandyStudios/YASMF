@@ -1,0 +1,23 @@
+uiview, uilabel, uibutton, uitextinput, uitabbar, uinavbar, uitoolbar, uisegment, uisegmentedbar
+{
+  display: block;
+  position: absolute;
+  overflow: hidden;
+  margin: 0 0;
+  padding: 0 0;
+  border: none;
+  line-height: 1em;
+  font-size: 20px;
+  -webkit-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+}
+
+uilabel
+{
+  text-align: left;
+  color: #333;
+  text-shadow: none;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 20px;
+  font-weight: normal;
+}
