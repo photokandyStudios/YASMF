@@ -25,11 +25,17 @@
          white:false,
          onevar:false 
  */
-/*global device, PKDEVICE, PKUTIL, $ge, cordova*/
+/*global device, PKDEVICE, PKUTIL, $ge, cordova, console*/
+PKUTIL.require ( ["PKUTIL", "PKDEVICE"], function () 
+{ 
+    PKUTIL.export ( [ "PKUI", "PKUI.CORE"] );
+});
+
 var PKUI = PKUI ||
 {
 };
 // create the namespace
+PKUI.version = { major: 0, minor: 3, rev: 100 };
 
 PKUI.CORE = PKUI.CORE ||
 {
@@ -860,6 +866,7 @@ PKUI.CORE.popView = function()
 PKUI.CORE.translateWindowsEvents = function(theEvent)
 {
   var theTranslatedEvent = theEvent;
+  if (!theTranslatedEvent) { return theTranslatedEvent; }
   if (device.platform == "WinCE" && theTranslatedEvent.toLowerCase().indexOf("touch") > -1 )
   {
     theTranslatedEvent = theTranslatedEvent.replace("touch", "mouse");

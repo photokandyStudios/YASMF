@@ -29,10 +29,15 @@
          onevar:false 
  */
 /*global PKUTIL, Globalize, device */
+PKUTIL.require ( "PKUTIL", function () 
+{ 
+    PKUTIL.export ( "PKLOC" );
+});
 
 var PKLOC = PKLOC ||
 {
 };
+PKLOC.version = { major: 0, minor: 3, rev: 100 };
 
 // define our current user locale so that we don't have to calculate it
 // each time we want it

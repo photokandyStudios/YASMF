@@ -27,6 +27,12 @@
  */
 
 /*global PKUTIL, device, PKDEVICE, __T */
+PKUTIL.require ( ["PKUTIL", "PKDEVICE", "PKUI", "PKUI.CORE"], function () 
+{ 
+    PKUTIL.export ( "PKUI.MESSAGE" );
+});
+
+
 var PKUI = PKUI ||
 {
 };
@@ -35,7 +41,7 @@ var PKUI = PKUI ||
 PKUI.MESSAGE = PKUI.MESSAGE ||
 {
 };
-
+PKUI.MESSAGE.version = { major: 0, minor: 3, rev: 100 };
 PKUI.MESSAGE.messageStack = [];
 PKUI.MESSAGE.currentMessage = null;
 

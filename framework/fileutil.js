@@ -67,11 +67,16 @@
          onevar:false 
  */
 /*global LocalFileSystem, PKUTIL, FileEntry, DirectoryEntry*/
+PKUTIL.require ( "PKUTIL.FILE", function () 
+{ 
+    PKUTIL.export ( "PKFILE" );
+});
 
 var PKFILE = PKFILE ||
 {
 };
 // create the namespace
+PKFILE.version = { major: 0, minor: 3, rev: 100 };
 
 //
 // Properties
