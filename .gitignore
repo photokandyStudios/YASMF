@@ -19,3 +19,7 @@ demo/www/framework
 
 demo/www/res
 
+
+demo/merges/android/cordova.js
+
+demo/merges/ios/cordova.js
