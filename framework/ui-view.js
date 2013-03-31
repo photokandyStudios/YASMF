@@ -24,7 +24,12 @@
          white:false,
          onevar:false 
  */
-/*global PKObject */
+/*global PKObject, PKUTIL */
+/*requires pk-object.js */
+PKUTIL.require ( ["PKUTIL", "UI", "PKObject"], function () 
+{ 
+    PKUTIL.export ( "UIView" );
+});
 
 var UI = UI || {};
 
@@ -51,9 +56,7 @@ UI.View = function ()
    * All views have direct DOM representations
    *
    */
-  self._element = document.createElement ( "DIV" );
-  self._element.style.position = "absolute";
-  self._element.style.display = "none"; // views are hidden by default
+  self._element = null; 
   /**
    *
    * All views have subviews
@@ -167,16 +170,16 @@ UI.View = function ()
    * Every view has a background color, even if it is transparent.
    *
    */
-  self._backgroundColor = "transparent";
+  self._backgroundColor = null;
   self.getBackgroundColor = function ()
   {
     return self._backgroundColor;
   };
   self.setBackgroundColor = function ( theColor )
   {
-    self._backgroundColor = theColor;
-    self._element.style.backgroundColor = theColor;
-    self.notify ("backgroundColorDidChang");
+    self._backgroundColor = UI.copyColor(theColor);
+    self._element.style.backgroundColor = UI._colorToRGBA (theColor);
+    self.notify ("backgroundColorDidChange");
   };
 
   self.__defineGetter__("backgroundColor", self.getBackgroundColor);
@@ -187,7 +190,7 @@ UI.View = function ()
    * Every view can be shown or hidden
    *
    */
-  self._visible = false;
+  self._visible = true;
   self.getVisibility = function ()
   {
     return self._visible;
@@ -198,7 +201,7 @@ UI.View = function ()
     {
       self.notify ( visibility ? "viewWillAppear" : "viewWillDisappear" );
       self._visible = visibility;
-      self._element.display = ( visibility ? "block" : "none" );
+      self._element.style.display = ( visibility ? "inherit" : "none" );
       self.notify ( visibility ? "viewDidAppear" : "viewDidDisappear" );
       self.notify ( "visibilityDidChange" );
     }
@@ -235,13 +238,18 @@ UI.View = function ()
    *
    */
   self.overrideSuper ( self.class, "init", self.init );
-  self.init = function ()
+  self.init = function ( noNotify )
   {
     // super first
-    self.super ( self.class, "init" );
+    self.super ( "UIView", "init" );
 
     // any view initialization
-    self.notify ( "viewDidInit" );
+    self._element = document.createElement ( self.class );
+    self.backgroundColor = UI.COLOR.lightGrayColor();
+    //self._element.style.display = "none"; // views are hidden by default    
+
+    // notify of the initialization
+    if (!noNotify) { self.notify ( "viewDidInit" ); }
   };
   self.initWithFrame = function ( theFrame )
   {
