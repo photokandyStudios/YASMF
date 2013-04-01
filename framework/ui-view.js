@@ -334,14 +334,6 @@ UI.View = function ()
   {
     self._overflow = v;
     self._element.style.overflow = v;
-/*    if (v=="scroll")
-    {
-        self._element.style.webkitOverflowScrolling = "touch";
-    }
-    else
-    {      
-        self._element.style.webkitOverflowScrolling = "";
-    } */
   }
   self.__defineGetter__("overflow", self.getOverflow);
   self.__defineSetter__("overflow", self.setOverflow);
