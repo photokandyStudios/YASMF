@@ -249,7 +249,7 @@ var PKObject = function ()
             console.log ( theNotification + " has not been registered.");
             return;
         }
-        console.log ( "Notifying " + self._notificationListeners[theNotification].length + " listeners for " + theNotification );
+        //console.log ( "Notifying " + self._notificationListeners[theNotification].length + " listeners for " + theNotification );
         for (var i=0; i< self._notificationListeners[theNotification].length; i++ )
         {
             self._notificationListeners[theNotification][i]( self, theNotification );
