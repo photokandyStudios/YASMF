@@ -84,6 +84,16 @@ UI.View = function ()
   {
     self._superView.removeSubView ( self );
   };
+  self.getSubViews = function ()
+  {
+    return self._subViews;
+  }
+  self.getSuperView = function ()
+  {
+    return self._superView;
+  }
+  self.__defineGetter__ ( "subViews", self.getSubViews );
+  self.__defineGetter__ ( "superView", self.getSuperView );
 
   /**
    *
@@ -103,9 +113,13 @@ UI.View = function ()
     {
       self._frame = UI.zeroRect();
     }
-    self._frame.size = UI.copySize ( newBounds.size );
-    self.notify ("boundsDidChanged");
-    self.notify ("frameDidChange");
+    if (self._frame.size.w != self._bounds.size.w ||
+        self._frame.size.h != self._bounds.size.h)
+    {
+      self._frame.size = UI.copySize ( newBounds.size );
+      self.notify ("boundsDidChanged");
+      self.notify ("frameDidChange");
+    }
   }
   self.getFrame = function ()
   {
@@ -118,14 +132,74 @@ UI.View = function ()
     {
       self._bounds = UI.zeroRect();
     }
-    self._bounds.size = UI.copySize ( newFrame.size );
+    if ( self._bounds.size.w != self._frame.size.w ||
+         self._bounds.size.h != self._frame.size.h )
+    {
+      self._bounds.size = UI.copySize ( newFrame.size );
+      self.notify ("boundsDidChange");      
+    }
     self.notify ("frameDidChange");
-    self.notify ("boundsDidChange");
   }
   self.__defineGetter__("bounds", self.getBounds);
   self.__defineSetter__("bounds", self.setBounds);
   self.__defineGetter__("frame", self.getFrame);
   self.__defineSetter__("frame", self.setFrame);
+
+  self._useGPU = false;
+  self._useGPUForPositioning = false;
+  self.getUseGPU = function ()
+  {
+    return self._useGPU;
+  }
+  self.getUseGPUForPositioning = function ()
+  {
+    return self._useGPUForPositioning;
+  }
+  self.setUseGPU = function ( v )
+  {
+    self._useGPU = v;
+    if (v)
+    {
+      if (!self._useGPUForPositioning)
+      {
+        self._element.style.webkitTransform = "translate3d(0,0,0)";
+      }
+      else
+      {
+        self._element.style.webkitTransform = "translate3d(" + self._frame.origin.x + "px," + self._frame.origin.y + "px,0)";
+//        self._element.style.webkitTransform = "translate(" + self._frame.origin.x + "px," + self._frame.origin.y + "px)";
+      }
+    }
+    else
+    {
+      self._element.style.webkitTransform = "inherit";
+    }
+  }
+  self.setUseGPUForPositioning = function ( v )
+  {
+    self._useGPUForPositioning = v;
+    if (v && self._useGPU)
+    {
+      self._element.style.top = "";
+      self._element.style.left = "";
+    }
+    else
+    {
+      if (self._useGPU)
+      {
+        self._element.style.webkitTransform = "translate3d(0,0,0)";
+      }
+      else
+      {
+        self._element.style.webkitTransform = "";
+      }
+    }
+    self.notify ( "frameDidChange" );
+  }
+  self.__defineGetter__("useGPU", self.getUseGPU);
+  self.__defineSetter__("useGPU", self.setUseGPU);
+  self.__defineGetter__("useGPUForPositioning", self.getUseGPUForPositioning);
+  self.__defineSetter__("useGPUForPositioning", self.setUseGPUForPositioning);
 
   /**
    *
@@ -136,20 +210,26 @@ UI.View = function ()
    * decide to be re-positioned.
    *
    */
-  self._calcElement = function ()
+  self._calcElement = function ( o, n )
   {    
     // allow us the opportunity to override
-    if (self.calcElement)
+    if ( n == "frameDidChange" )
     {
-      self.calcElement();
+      if (self.calcElement)
+      {
+        self.calcElement();
+      }
     }
 
-    // and notify all our sub views.
-    for (var i=0; i<self._subViews.length; i++)
+    // and notify all our sub views if our bounds have changed
+    if ( n == "boundsDidChange" )
     {
-      if ( self._subViews[i]._calcElement )
+      for (var i=0; i<self._subViews.length; i++)
       {
-        self._subViews[i]._calcElement();
+        if ( self._subViews[i]._calcElement )
+        {
+          self._subViews[i]._calcElement();
+        }
       }
     }
   }
@@ -157,10 +237,19 @@ UI.View = function ()
   {
     // only change properties that have changed
     if (self._element.style.position != "absolute") { self._element.style.position = "absolute"; }
-    if (self._frame.origin.y + "px" != self._element.style.top) { self._element.style.top = self._frame.origin.y + "px"; }
-    if (self._frame.origin.x + "px" != self._element.style.left) { self._element.style.left = self._frame.origin.x + "px"; }
+    if (self._useGPUForPositioning && self._useGPU)
+    {
+      self._element.style.webkitTransform = "translate3d(" + self._frame.origin.x + "px," + self._frame.origin.y + "px,0)";  
+//      self._element.style.webkitTransform = "translate(" + self._frame.origin.x + "px," + self._frame.origin.y + "px)";  
+    }
+    else
+    {
+      if (self._frame.origin.y + "px" != self._element.style.top) { self._element.style.top = self._frame.origin.y + "px"; }
+      if (self._frame.origin.x + "px" != self._element.style.left) { self._element.style.left = self._frame.origin.x + "px"; }
+    }
     if (self._frame.size.w + "px" != self._element.style.width) { self._element.style.width = self._frame.size.w + "px"; }
     if (self._frame.size.h + "px" != self._element.style.height) { self._element.style.height = self._frame.size.h + "px"; }
+    
   }
   // when our frame changes, we must know. Call self._calcElement
   self.addListenerForNotification ( "frameDidChange" , self._calcElement );
@@ -231,6 +320,32 @@ UI.View = function ()
   self.__defineGetter__("opacity", self.getOpacity);
   self.__defineSetter__("opacity", self.setOpacity);
 
+  /**
+   *
+   * Views can override their scrolling
+   *
+   */
+  self._overflow = "inherit";
+  self.getOverflow = function ()
+  {
+    return self._overflow;
+  }
+  self.setOverflow = function ( v )
+  {
+    self._overflow = v;
+    self._element.style.overflow = v;
+/*    if (v=="scroll")
+    {
+        self._element.style.webkitOverflowScrolling = "touch";
+    }
+    else
+    {      
+        self._element.style.webkitOverflowScrolling = "";
+    } */
+  }
+  self.__defineGetter__("overflow", self.getOverflow);
+  self.__defineSetter__("overflow", self.setOverflow);
+
 
   /**
    *
@@ -246,7 +361,6 @@ UI.View = function ()
     // any view initialization
     self._element = document.createElement ( self.class );
     self.backgroundColor = UI.COLOR.lightGrayColor();
-    //self._element.style.display = "none"; // views are hidden by default    
 
     // notify of the initialization
     if (!noNotify) { self.notify ( "viewDidInit" ); }
@@ -261,6 +375,11 @@ UI.View = function ()
     self.init();
     if (options.frame)              { self.frame = options.frame; }
     if (options.backgroundColor)    { self.backgroundColor = options.backgroundColor; }
+    if (options.visible)            { self.visible = options.visible; }
+    if (options.opacity)            { self.opacity = options.opacity; }
+    if (options.useGPU)             { self.useGPU = options.useGPU; }
+    if (options.useGPUForPositioning) { self.useGPUForPositioning = options.useGPUForPositioning; }
+    if (options.overflow)           { self.overflow = options.overflow; }
   };
 
   return self;
