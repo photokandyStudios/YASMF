@@ -59,20 +59,50 @@ APP.start = function ()
 {
     var aView = new UI.View();
     APP.rootView = aView;
-    aView.initWithOptions ( { backgroundColor: UI.COLOR.redColor(), frame: UI.makeRect ( UI.makePoint(10,10), UI.makeSize(300,200) ) } );
+    aView.initWithOptions ( 
+        { backgroundColor: UI.COLOR.redColor(), 
+                   //useGPU: true,// useGPUForPositioning: true,
+                    frame: UI.makeRect ( UI.makePoint(10,10), UI.offsetSize( UI.screenSize(), UI.makeSize (-20, -20) ) ) 
+        } 
+    );
     $ge("rootContainer").appendChild(aView._element);
 
-    var aLabel = new UI.Label();
-    aLabel.initWithOptions ( 
+    var scrollView = new UI.View();
+    var aRect = aView.bounds;
+    aRect.size.h = 20 * 200;
+    scrollView.initWithFrame ( aRect );
+    //scrollView.useGPU = true;
+    //scrollView.useGPUForPositioning = true;
+    scrollView.backgroundColor = UI.makeColor( 228, 228, 228, 1.0 );
+    aView.addSubView (scrollView);
+
+    for (var i=0; i<200; i++)
     {
-        backgroundColor: UI.makeColor(228, 228, 228, 1.0),
-        frame: UI.makeRect ( UI.makePoint (10,10), UI.makeSize (280, 20) ),
-        textColor: UI.COLOR.darkTextColor(),
-//        shadow: UI.makeShadow ( true, UI.COLOR.whiteColor(), UI.makePoint(0,-1), 0),
-//        textAlignment: "center",
-        text: "A New Label"
-    });
-    aView.addSubView (aLabel);
+        var aLabel = new UI.Label();
+        aLabel.initWithOptions (
+        {
+            backgroundColor: UI.makeColor (228, 228, 228, 0.0),
+            //useGPU: true,// useGPUForPositioning: true,
+            frame: UI.makeRect ( UI.makePoint ( 10, i*20 ), UI.makeSize ( scrollView.bounds.size.w-20, 20 ) ),
+            textColor: UI.COLOR.darkTextColor(),
+            text: "This is label #" + i
+        });
+        scrollView.addSubView (aLabel);
+    }
+
+    aView.overflow = "scroll";
+
+    //APP.animate();
+}
+
+APP.animate = function ()
+{
+    var scrollView = APP.rootView.subViews[0];
+    scrollView.frame = UI.offsetRectByPoint ( scrollView.frame, UI.makePoint ( 0, -1 ) );
+    if (scrollView.frame.origin.y > -500)
+    {
+        setTimeout ( APP.animate, 0 );
+    }
 }
 
 document.addEventListener ( "deviceready", APP.loadLibraries, false );
