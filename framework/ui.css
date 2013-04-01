@@ -10,6 +10,7 @@ uiview, uilabel, uibutton, uitextinput, uitabbar, uinavbar, uitoolbar, uisegment
   font-size: 20px;
   -webkit-box-sizing: border-box;
   -ms-box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 }
 
 uilabel
@@ -20,4 +21,39 @@ uilabel
   font-family: Helvetica, Arial, sans-serif;
   font-size: 20px;
   font-weight: normal;
+}
+
+uibutton
+{
+
+}
+
+uitextinput
+{
+
+}
+
+uitabbar
+{
+
+}
+
+uinavbar
+{
+
+}
+
+uitoolbar
+{
+
+}
+
+uisegment
+{
+
+}
+
+uisegmentbar
+{
+
 }
