@@ -81,7 +81,6 @@ APP.start = function ()
         var aLabel = new UI.Label();
         aLabel.initWithOptions (
         {
-            backgroundColor: UI.makeColor (228, 228, 228, 0.0),
             //useGPU: true,// useGPUForPositioning: true,
             frame: UI.makeRect ( UI.makePoint ( 10, i*20 ), UI.makeSize ( scrollView.bounds.size.w-20, 20 ) ),
             textColor: UI.COLOR.darkTextColor(),
