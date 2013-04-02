@@ -53,10 +53,34 @@ PKDEVICE.platform = function()
   }
   if (!device)
   {
+    if (navigator.platform == "iPad" ||
+        navigator.platform == "iPad Simulator" ||
+        navigator.platform == "iPhone" || 
+        navigator.platform == "iPhone Simulator" ||
+        navigator.platform == "iPod" )
+    {
+      return "ios";
+    }
+    if ( navigator.userAgent.toLowerCase().indexOf ("android") > -1 )
+    {
+      return "android";
+    }
     return "unknown";
   }
   if (!device.platform)
   {
+    if (navigator.platform == "iPad" ||
+        navigator.platform == "iPad Simulator" ||
+        navigator.platform == "iPhone" || 
+        navigator.platform == "iPhone Simulator" ||
+        navigator.platform == "iPod" )
+    {
+      return "ios";
+    }
+    if ( navigator.userAgent.toLowerCase().indexOf ("android") > -1 )
+    {
+      return "android";
+    }
     return "unknown";
   }
   var thePlatform = device.platform.toLowerCase();
