@@ -334,3 +334,66 @@ UI.COLOR.brownColor     = function () { return UI.makeColor ( 153, 102,  51, 1.0
 UI.COLOR.lightTextColor = function () { return UI.makeColor ( 240, 240, 240, 1.0 ); }
 UI.COLOR.darkTextColor  = function () { return UI.makeColor (  15,  15,  15, 1.0 ); }
 UI.COLOR.clearColor     = function () { return UI.makeColor (   0,   0,   0, 0.0 ); }
+
+/**
+ *
+ * events
+ *
+ */
+UI.makeEvent = function ( e )
+{
+  var newEvent = { _originalEvent: e, touches: [], x: -1, y: -1, avgX: -1, avgY: -1 };
+  if (e.touches)
+  {
+    var avgXTotal = 0;
+    var avgYTotal = 0;
+    for (var i=0; i<e.touches.length; i++)
+    {
+      newEvent.touches.push ( { x: e.touches[i].clientX, y: e.touches[i].clientY } );
+      avgXTotal += e.touches[i].clientX;
+      avgYTotal += e.touches[i].clientY;
+      if (i===0)
+      {
+        newEvent.x = e.touches[i].clientX;
+        newEvent.y = e.touches[i].clientY;
+      }
+    }
+    if (e.touches.length>0)
+    {
+      newEvent.avgX = avgXTotal / e.touches.length;
+      newEvent.avgY = avgYTotal / e.touches.length;
+    }
+  }
+  else
+  {
+    if (event.pageX)
+    {
+      newEvent.touches.push ( { x: e.pageX, y: e.pageY } );
+      newEvent.x = e.pageX;
+      newEvent.y = e.pageY;
+      newEvent.avgX = e.pageX;
+      newEvent.avgY = e.pageY;
+    }
+  }
+  return newEvent;
+}
+
+UI.cancelEvent = function ( e )
+{
+  if (e._originalEvent.cancelBubble)
+  {
+    e._originalEvent.cancelBubble();
+  }
+  if (e._originalEvent.stopPropagation)
+  {
+    e._originalEvent.stopPropagation();
+  }
+  if (e._originalEvent.preventDefault)
+  {
+    e._originalEvent.preventDefault();
+  } else
+  {
+    e._originalEvent.returnValue = false;
+  }
+}
+
