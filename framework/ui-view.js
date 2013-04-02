@@ -48,6 +48,10 @@ UI.View = function ()
   self.registerNotification ( "viewWillDisappear" );
   self.registerNotification ( "viewDidDisappear" );
   self.registerNotification ( "viewDidInit" );
+  self.registerNotification ( "tapped" );
+  self.registerNotification ( "touchStarted" );
+  self.registerNotification ( "touchMoved" );
+  self.registerNotification ( "touchEnded" );
 
 
   /**
@@ -345,15 +349,9 @@ UI.View = function ()
   self._touchStart = function ( e )
   {
     var event = UI.makeEvent ( e || window.event );
-    if (!self._element.className )
-    {
-      self._element.oldClassName = "";
-    }
-    else
-    {
-      self._element.oldClassName = self._element.className;
-    }
     self._element.className += " touched ";
+    self._tapPotential = true;
+    self.notify ( "touchStarted" );
     if (self.touchStart)
     {
       return self.touchStart ( event );
@@ -363,10 +361,12 @@ UI.View = function ()
   self._touchMove = function ( e )
   {
     var event = UI.makeEvent ( e || window.event );
-    if (self._element.oldClassName)
+    self._tapPotential = false;
+    if (self._element.className)
     {
-      self._element.className = self._element.oldClassName;
+      self._element.className = self._element.className.replace(/touched/g,"");
     }
+    self.notify ( "touchMoved" );
     if (self.touchMove)
     {
       return self.touchMove ( event );
@@ -376,12 +376,54 @@ UI.View = function ()
   self._touchEnd = function ( e )
   {
     var event = UI.makeEvent ( e || window.event );
-    self._element.className = self._element.oldClassName;
+    if (self._element.className)
+    {
+      self._element.className = self._element.className.replace(/touched/g,"");
+    }
+    self.notify ( "touchEnded" );
+    if (self._tapPotential)
+    {
+      self.notify ( "tapped" );
+    }
+    self._tapPotential = false;
     if (self.touchEnd)
     {
       return self.touchEnd ( event );
     }
   }
+
+  self._interactive = false;
+  self._touchHandlersAdded = false;
+  self.getInteractive = function ()
+  {
+    return self._interactive;
+  }
+  self.setInteractive = function ( v )
+  {
+    self._interactive = v;
+    if (v)
+    {
+      if (!self._touchHandlersAdded)
+      {
+        PKUI.CORE.addTouchListener ( self._element, "touchstart", self._touchStart );
+        PKUI.CORE.addTouchListener ( self._element, "touchmove", self._touchMove );
+        PKUI.CORE.addTouchListener ( self._element, "touchend", self._touchEnd );      
+      }
+      self._touchHandlersAdded = true;
+    }
+    else
+    {
+      if (self._touchHandlersAdded)
+      {
+        PKUI.CORE.removeTouchListener ( self._element, "touchstart", self._touchStart );
+        PKUI.CORE.removeTouchListener ( self._element, "touchmove", self._touchMove );
+        PKUI.CORE.removeTouchListener ( self._element, "touchend", self._touchEnd );
+        self._touchHandlersAdded = false;        
+      }
+    }
+  }
+  self.__defineGetter__("interactive", self.getInteractive);
+  self.__defineSetter__("interactive", self.setInteractive);
 
   /**
    *
@@ -396,9 +438,6 @@ UI.View = function ()
 
     // any view initialization
     self._element = document.createElement ( self.class );
-    PKUI.CORE.addTouchListener ( self._element, "touchstart", self._touchStart );
-    PKUI.CORE.addTouchListener ( self._element, "touchmove", self._touchMove );
-    PKUI.CORE.addTouchListener ( self._element, "touchend", self._touchEnd );
     //self.backgroundColor = UI.COLOR.lightGrayColor();
 
     // notify of the initialization
@@ -419,6 +458,7 @@ UI.View = function ()
     if (options.useGPU)             { self.useGPU = options.useGPU; }
     if (options.useGPUForPositioning) { self.useGPUForPositioning = options.useGPUForPositioning; }
     if (options.overflow)           { self.overflow = options.overflow; }
+    if (options.interactive)        { self.interactive = options.interactive; }
   };
 
   return self;
