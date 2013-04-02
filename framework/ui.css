@@ -23,12 +23,6 @@ uilabel
   font-weight: normal;
 }
 
-uilabel.touched
-{
-  background-color: #204080;
-  color: #FFFFFF;
-}
-
 uibutton
 {
 
