@@ -24,9 +24,8 @@
          white:false,
          onevar:false 
  */
-/*global PKObject, PKUTIL */
-/*requires pk-object.js */
-PKUTIL.require ( ["PKUTIL", "UI", "PKObject"], function () 
+/*global PKObject, PKUTIL, PKUI */
+PKUTIL.require ( ["PKUTIL", "UI", "PKObject", "PKUI"], function () 
 { 
     PKUTIL.export ( "UIView" );
 });
@@ -338,6 +337,51 @@ UI.View = function ()
   self.__defineGetter__("overflow", self.getOverflow);
   self.__defineSetter__("overflow", self.setOverflow);
 
+  /**
+   *
+   * event processing
+   *
+   */
+  self._touchStart = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    if (!self._element.className )
+    {
+      self._element.oldClassName = "";
+    }
+    else
+    {
+      self._element.oldClassName = self._element.className;
+    }
+    self._element.className += " touched ";
+    if (self.touchStart)
+    {
+      return self.touchStart ( event );
+    }
+  }
+
+  self._touchMove = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    if (self._element.oldClassName)
+    {
+      self._element.className = self._element.oldClassName;
+    }
+    if (self.touchMove)
+    {
+      return self.touchMove ( event );
+    }
+  }
+
+  self._touchEnd = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    self._element.className = self._element.oldClassName;
+    if (self.touchEnd)
+    {
+      return self.touchEnd ( event );
+    }
+  }
 
   /**
    *
@@ -352,7 +396,10 @@ UI.View = function ()
 
     // any view initialization
     self._element = document.createElement ( self.class );
-    self.backgroundColor = UI.COLOR.lightGrayColor();
+    PKUI.CORE.addTouchListener ( self._element, "touchstart", self._touchStart );
+    PKUI.CORE.addTouchListener ( self._element, "touchmove", self._touchMove );
+    PKUI.CORE.addTouchListener ( self._element, "touchend", self._touchEnd );
+    //self.backgroundColor = UI.COLOR.lightGrayColor();
 
     // notify of the initialization
     if (!noNotify) { self.notify ( "viewDidInit" ); }
