@@ -867,7 +867,8 @@ PKUI.CORE.translateWindowsEvents = function(theEvent)
 {
   var theTranslatedEvent = theEvent;
   if (!theTranslatedEvent) { return theTranslatedEvent; }
-  if (device.platform == "WinCE" && theTranslatedEvent.toLowerCase().indexOf("touch") > -1 )
+  var nonTouchPlatform = ( PKDEVICE.platform() == "wince" || PKDEVICE.platform() == "unknown" );
+  if (nonTouchPlatform && theTranslatedEvent.toLowerCase().indexOf("touch") > -1 )
   {
     theTranslatedEvent = theTranslatedEvent.replace("touch", "mouse");
     theTranslatedEvent = theTranslatedEvent.replace("start", "down");
