@@ -86,6 +86,11 @@ APP.start = function ()
             textColor: UI.COLOR.darkTextColor(),
             text: "This is label #" + i
         });
+        if (i==5)
+        {
+            aLabel.interactive = true;
+            aLabel.addListenerForNotification ( "tapped", function () { console.log("Hi!"); } );
+        }
         scrollView.addSubView (aLabel);
     }
 
