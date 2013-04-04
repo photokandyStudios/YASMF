@@ -239,15 +239,16 @@ UI.FONT.boldSystemFont = function ()
  * Shadows
  *
  */
-UI.makeShadow = function ( theVisibility, theColor, theOffset, theBlur )
+UI.makeShadow = function ( theVisibility, theColor, theOffset, theBlur, theSpread, theType )
 {
-  return { visible: theVisibility, color: UI.copyColor(theColor), offset: UI.copyPoint ( theOffset ), blur: theBlur || 0 };
+  return { visible: theVisibility, color: UI.copyColor(theColor), offset: UI.copyPoint ( theOffset ), 
+           blur: theBlur || 0, spread: theSpread || 0, type: theType || "" };
 }
 UI.copyShadow = function ( theShadow )
 {
-  return UI.makeShadow ( theShadow.visible, theShadow.color, theShadow.offset, theShadow.blur );
+  return UI.makeShadow ( theShadow.visible, theShadow.color, theShadow.offset, theShadow.blur, theShadow.spread, theShadow.type );
 }
-UI._applyShadowToElement = function ( theElement, theShadow )
+UI._applyShadowToElementAsTextShadow = function ( theElement, theShadow )
 {
   if (theShadow)
   {
@@ -266,6 +267,28 @@ UI._applyShadowToElement = function ( theElement, theShadow )
   else
   {
     theElement.style.textShadow = "inherit";
+  }    
+}
+UI._shadowToBoxShadow = function (  theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      return  "" +  theShadow.type + " " + theShadow.offset.x + "px " +
+                                         theShadow.offset.y + "px " +
+                                         theShadow.blur + "px " +
+                                         theShadow.spread + "px " + 
+                                         UI._colorToRGBA(theShadow.color) + "";
+    }
+    else
+    {
+      return  "inherit";
+    }
+  }
+  else
+  {
+    return  "inherit";
   }    
 }
 UI.SHADOW = UI.SHADOW || {};
@@ -335,6 +358,199 @@ UI.COLOR.lightTextColor = function () { return UI.makeColor ( 240, 240, 240, 1.0
 UI.COLOR.darkTextColor  = function () { return UI.makeColor (  15,  15,  15, 1.0 ); }
 UI.COLOR.clearColor     = function () { return UI.makeColor (   0,   0,   0, 0.0 ); }
 
+/**
+ *
+ * Images
+ *
+ */
+
+UI.makeImage = function ( thePathToTheImage, theImageSize, options )
+{
+  var theRatio = window.devicePixelRatio;
+  var theNewImageSize = null
+  if (theImageSize)
+  {
+    theNewImageSize = UI.copySize( theImageSize );
+  }
+  var aNewImage = { image: thePathToTheImage, 
+                    imageSize : theNewImageSize,
+                    targetSize: null,
+                    repeat: options.repeat || "no-repeat",
+                    position: options.position || "top left",
+                    sizing: options.sizing || "",
+                    imageType: options.imageType || "url" }; // url, gradient, etc.
+  //UI.recalcImageSize ( aNewImage );
+  return aNewImage;
+}
+/*UI.recalcImageSize = function ( theImage )
+{
+  var theRatio = window.devicePixelRatio || 1;
+  if (theImage.imageSize)
+  {
+    var theTargetSize = UI.makeSize ( theImage.imageSize.w / theRatio,
+                                      theImage.imageSize.h / theRatio );
+    theImage.targetSize = theTargetSize;
+  }
+}*/
+UI.copyImage = function ( theImage )
+{
+  return UI.makeImage ( theImage.image, theImage.imageSize,
+                        { repeat: theImage.repeat, position: theImage.position, sizing: theImage.sizing,
+                          imageType: theImage.imageType } );
+}
+UI._applyImageToElement = function ( theElement, theImage )
+{
+  if (!theImage)
+  {
+    theElement.style.backgroundImage = "";
+    theElement.style.backgroundPosition = "";
+    theElement.style.backgroundSize = "";
+    theElement.style.backgroundRepeat = "";
+    return;
+  }
+  if (theImage.imageType == "url")
+  {
+      theElement.style.backgroundImage = "url(" + theImage.image + ")";
+  }
+  else
+  {
+    theElement.style.backgroundImage = theImage.image;
+  }
+  if (theImage.sizing !== "")
+  {
+    theElement.stle.backgroundSize = theImage.sizing; // cover, contain
+  }
+  else
+  {
+    if (theImage.imageSize)
+    {
+      theElement.style.backgroundSize = "" + 
+       ((theImage.imageSize.w>-1) ? theImage.imageSize.w + "px " : "auto ") + 
+       ((theImage.imageSize.h>-1) ? theImage.imageSize.h + "px" : "auto" );
+    }
+    else
+    {
+      theElement.style.backgroundSize = "";
+    }
+  }
+  theElement.style.backgroundPosition = theImage.position;
+  theElement.style.backgroundRepeat = theImage.repeat;
+}
+UI.makeLinearGradientImage = function ( gradientOrigin, colorStops )
+{
+  var gradientString = "-webkit-linear-gradient(" + gradientOrigin + ", ";
+  for (var i=0; i<colorStops.length; i++)
+  {
+    gradientString += UI._colorToRGBA(colorStops[i].color) + " " + (colorStops[i].position || "");
+    if (i<colorStops.length-1)
+    {
+      gradientString += ", "
+    }
+  }
+  gradientString += ")";
+  return UI.makeImage ( gradientString, null, { imageType: "gradient" } );
+}
+UI.makeSimpleLinearGradientImage = function ( gradientOrigin, color1, color1Position, color2, color2Position )
+{
+  return UI.makeLinearGradientImage ( gradientOrigin, [ {color: color1, position: color1Position},
+                                                        {color: color2, position: color2Position} ] );
+}
+/**
+ *
+ * borders
+ *
+ */
+UI.makeBorderForSide = function ( theBorderColor, theBorderStyle, theBorderStrokeWidth )
+{
+  var theNewColor = null;
+  if (theBorderColor) { theNewColor = UI.copyColor(theBorderColor); }
+
+  return { color: theNewColor, style: theBorderStyle || "inherit", width: theBorderStrokeWidth || "inherit"};
+}
+UI.copyBorderForSide = function ( theBorderForSide )
+{
+  return UI.makeBorderForSide (theBorderForSide.color, theBorderForSide.style, theBorderForSide.width );
+}
+UI.makeBorder = function ( borders, borderRadii )
+{
+  var theBorder = { color: null, style: "inherit", width: 0 };
+  if (borders)
+  {
+    if (borders.color) { theBorder.color = UI.copyColor(borders.color); }
+    if (borders.style) { theBorder.style = borders.style  }
+    if (borders.width) { theBorder.width = borders.width  }
+    if (borders.top) { theBorder.top = UI.copyBorderForSide(borders.top); }
+    if (borders.left) { theBorder.left = UI.copyBorderForSide(borders.left); }
+    if (borders.right) { theBorder.right = UI.copyBorderForSide(borders.right); }
+    if (borders.bottom) { theBorder.bottom = UI.copyBorderForSide(borders.bottom); }
+  }
+  if (borderRadii)
+  {
+    theBorder.topLeftBorderRadius = borderRadii.topLeftBorderRadius || borderRadii.borderRadius || "inherit";
+    theBorder.topRightBorderRadius = borderRadii.topRightBorderRadius || borderRadii.borderRadius || "inherit";
+    theBorder.bottomLeftBorderRadius = borderRadii.bottomLeftBorderRadius || borderRadii.borderRadius || "inherit";
+    theBorder.bottomRightBorderRadius = borderRadii.bottomRightBorderRadius || borderRadii.borderRadius || "inherit";
+  }
+  else
+  {
+    theBorder.topLeftBorderRadius = "inherit";
+    theBorder.topRightBorderRadius = "inherit";
+    theBorder.bottomLeftBorderRadius = "inherit";
+    theBorder.bottomRightBorderRadius = "inherit";
+  }
+  return theBorder;
+}
+UI.copyBorder = function ( borders )
+{
+  return UI.makeBorder ( borders, { topLeftBorderRadius: borders.topLeftBorderRadius, 
+                                    topRightBorderRadius: borders.topRightBorderRadius,
+                                    bottomLeftBorderRadius: borders.bottomLeftBorderRadius, 
+                                    bottomRightBorderRadius: borders.bottomRightBorderRadius } );
+}
+UI._applyBorderToElement = function ( theElement, theBorder )
+{
+  // over-arching
+  if ( theBorder.color ) { theElement.style.borderColor = UI._colorToRGBA(theBorder.color); }
+                    else { theElement.style.borderColor = "" }
+  if ( theBorder.style !== "inherit" ) { theElement.style.borderStyle = theBorder.style; }
+                                  else { theElement.style.borderStyle = ""; }
+  if ( theBorder.width !== "inherit" ) { theElement.style.borderWidth = "" + theBorder.width + "px"; }
+                                  else { theElement.style.borderWidth = ""; }
+  // and now, the specifics
+  if ( theBorder.left )
+  {
+    if (theBorder.left.color) { theElement.style.borderLeftColor = UI._colorToRGBA(theBorder.left.color); }
+    if ( theBorder.left.style !== "inherit" ) { theElement.style.borderLeftStyle = theBorder.left.style; }
+    if ( theBorder.left.width !== "inherit" ) { theElement.style.borderLeftWidth = "" + theBorder.left.width + "px"; }
+  }
+
+  if ( theBorder.top )
+  {
+    if (theBorder.top.color) { theElement.style.borderTopColor = UI._colorToRGBA(theBorder.top.color); }
+    if ( theBorder.top.style !== "inherit" ) { theElement.style.borderTopStyle = theBorder.top.style; }
+    if ( theBorder.top.width !== "inherit" ) { theElement.style.borderTopWidth = "" + theBorder.top.width + "px"; }
+  }
+
+  if ( theBorder.right )
+  {
+    if (theBorder.right.color) { theElement.style.borderRightColor = UI._colorToRGBA(theBorder.right.color); }
+    if ( theBorder.right.style !== "inherit" ) { theElement.style.borderRightStyle = theBorder.right.style; }
+    if ( theBorder.right.width !== "inherit" ) { theElement.style.borderRightWidth = "" + theBorder.right.width + "px"; }
+  }
+
+  if ( theBorder.bottom )
+  {
+    if (theBorder.bottom.color) { theElement.style.borderBottomColor = UI._colorToRGBA(theBorder.bottom.color); }
+    if ( theBorder.bottom.style !== "inherit" ) { theElement.style.borderBottomStyle = theBorder.bottom.style; }
+    if ( theBorder.bottom.width !== "inherit" ) { theElement.style.borderBottomWidth = "" + theBorder.bottom.width + "px"; }
+  }
+
+  // border radii
+  theElement.style.borderTopLeftRadius = theBorder.topLeftBorderRadius == "inherit" ? "" : theBorder.topLeftBorderRadius + "px";
+  theElement.style.borderTopRightRadius = theBorder.topRightBorderRadius == "inherit" ? "" : theBorder.topRightBorderRadius + "px";
+  theElement.style.borderBottomLeftRadius = theBorder.bottomLeftBorderRadius == "inherit" ? "" : theBorder.bottomLeftBorderRadius + "px";
+  theElement.style.borderBottomRightRadius = theBorder.bottomRightBorderRadius == "inherit" ? "" : theBorder.bottomRightBorderRadius + "px";
+}
 /**
  *
  * events
