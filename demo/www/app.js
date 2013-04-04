@@ -60,8 +60,10 @@ APP.start = function ()
     var aView = new UI.View();
     APP.rootView = aView;
     aView.initWithOptions ( 
-        { backgroundColor: UI.COLOR.redColor(), 
+        { //backgroundColor: UI.COLOR.redColor(), 
                    //useGPU: true,// useGPUForPositioning: true,
+//            backgroundImage: UI.makeSimpleLinearGradientImage ( "top", UI.makeColor(192,192,192,1), "0%", 
+//                                                                       UI.makeColor(228,228,228,1), "100%" ),
                     frame: UI.makeRect ( UI.makePoint(10,10), UI.offsetSize( UI.screenSize(), UI.makeSize (-20, -20) ) ) 
         } 
     );
@@ -73,7 +75,10 @@ APP.start = function ()
     scrollView.initWithFrame ( aRect );
     //scrollView.useGPU = true;
     //scrollView.useGPUForPositioning = true;
-    scrollView.backgroundColor = UI.makeColor( 228, 228, 228, 1.0 );
+    //scrollView.backgroundColor = UI.makeColor( 228, 228, 228, 1.0 );
+    aView.backgroundImage = UI.makeImage ( "./images/crisp_paper_ruffles.png", UI.makeSize(481/2,500/2),
+                                                { repeat: "repeat" } );
+
     aView.addSubView (scrollView);
 
     for (var i=0; i<200; i++)
