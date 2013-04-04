@@ -1,4 +1,4 @@
-uiview, uilabel, uibutton, uitextinput, uitabbar, uinavbar, uitoolbar, uisegment, uisegmentedbar
+.UIView
 {
   display: block;
   position: absolute;
@@ -10,10 +10,12 @@ uiview, uilabel, uibutton, uitextinput, uitabbar, uinavbar, uitoolbar, uisegment
   font-size: 20px;
   -webkit-box-sizing: border-box;
   -ms-box-sizing: border-box;
+  box-sizing: border-box;
+  background-origin: border-box;
   -webkit-overflow-scrolling: touch;
 }
 
-uilabel
+.UILabel
 {
   text-align: left;
   color: #333;
@@ -23,37 +25,37 @@ uilabel
   font-weight: normal;
 }
 
-uibutton
+.UIButton
 {
 
 }
 
-uitextinput
+.UITextInput
 {
 
 }
 
-uitabbar
+.UITabBar
 {
 
 }
 
-uinavbar
+.UINavBar
 {
 
 }
 
-uitoolbar
+.UIToolBar
 {
 
 }
 
-uisegment
+.UISegment
 {
 
 }
 
-uisegmentbar
+.UISegmentBar
 {
 
 }
