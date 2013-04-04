@@ -25,7 +25,7 @@
          onevar:false 
  */
 /*global PKObject, PKUTIL, PKUI */
-PKUTIL.require ( ["PKUTIL", "UI", "PKObject", "PKUI"], function () 
+PKUTIL.require ( ["PKUTIL", "UI", "PKObject", "PKUI" ], function () 
 { 
     PKUTIL.export ( "UIView" );
 });
@@ -41,7 +41,10 @@ UI.View = function ()
   self.registerNotification ( "boundsDidChange" );
   self.registerNotification ( "frameDidChange" );
   self.registerNotification ( "backgroundColorDidChange" );
+  self.registerNotification ( "backgroundImageDidChange" );
+  self.registerNotification ( "borderDidChange" );
   self.registerNotification ( "opacityDidChange" );
+  self.registerNotification ( "shadowDidChange" );
   self.registerNotification ( "visibilityDidChange" );
   self.registerNotification ( "viewWillAppear" );
   self.registerNotification ( "viewDidAppear" );
@@ -279,6 +282,75 @@ UI.View = function ()
 
   /**
    *
+   * Every view can have a background image
+   *
+   */
+  self._backgroundImage = null;
+  self.getBackgroundImage = function ()
+  {
+    return self._backgroundImage;
+  }
+  self.setBackgroundImage = function ( theImage )
+  {
+    self._backgroundImage = UI.copyImage ( theImage );
+    UI._applyImageToElement ( self._element, self._backgroundImage );
+    self.notify ("backgroundImageDidChange");
+  }
+  self.__defineGetter__("backgroundImage", self.getBackgroundImage);
+  self.__defineSetter__("backgroundImage", self.setBackgroundImage);
+
+  /**
+   *
+   * Every view can also have a border
+   *
+   */
+  self._border = null;
+  self.getBorder = function ()
+  {
+    return self._border;
+  }
+  self.setBorder = function ( theBorder )
+  {
+    self._border = UI.copyBorder (theBorder);
+    UI._applyBorderToElement ( self._element, self._border )
+    {
+      self.notify ("borderDidChange");
+    }
+  }
+  self.__defineGetter__("border", self.getBorder);
+  self.__defineSetter__("border", self.setBorder);
+
+  /**
+   *
+   * And every view can also have multiple shadows
+   *
+   */
+  self._shadows = [];
+  self.getShadows = function ()
+  {
+    return self._shadows;
+  }
+  self.setShadows = function ( theShadows )
+  {
+    var shadowString = "";
+    self._shadows = [];
+    for (var i=0; i<theShadows.length; i++)
+    {
+      self._shadows.push ( UI.copyShadow ( theShadows[i] ) );
+      shadowString += UI._shadowToBoxShadow ( self._shadows[i] );
+      if (i<theShadows.length-1)
+      {
+        shadowString += ", ";
+      }
+    }
+    self._element.style.boxShadow = shadowString;
+    self.notify ("shadowDidChange");
+  }
+  self.__defineGetter__("shadows", self.getShadows);
+  self.__defineSetter__("shadows", self.setShadows);
+
+  /**
+   *
    * Every view can be shown or hidden
    *
    */
@@ -438,6 +510,7 @@ UI.View = function ()
 
     // any view initialization
     self._element = document.createElement ( self.class );
+    self._element.className = self._classHierarchy.join (" ");
     //self.backgroundColor = UI.COLOR.lightGrayColor();
 
     // notify of the initialization
@@ -453,6 +526,9 @@ UI.View = function ()
     self.init();
     if (options.frame)              { self.frame = options.frame; }
     if (options.backgroundColor)    { self.backgroundColor = options.backgroundColor; }
+    if (options.backgroundImage)    { self.backgroundImage = options.backgroundImage; }
+    if (options.border)             { self.border = options.border; }
+    if (options.shadows)            { self.shadows = options.shadows; }
     if (options.visible)            { self.visible = options.visible; }
     if (options.opacity)            { self.opacity = options.opacity; }
     if (options.useGPU)             { self.useGPU = options.useGPU; }
