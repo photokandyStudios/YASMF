@@ -40,7 +40,7 @@ UI.Label = function ()
   // register any notifications
   self.registerNotification ( "textDidChange" );
   self.registerNotification ( "textColorDidChange" );
-  self.registerNotification ( "shadowDidChange" );
+  self.registerNotification ( "textShadowDidChange" );
   self.registerNotification ( "textAlignmentDidChange" );
   self.registerNotification ( "fontDidChange" );
 
@@ -61,19 +61,19 @@ UI.Label = function ()
   self._text = "";
   self._textAlignment = "inherit";
   self._textColor = null;
-  self._shadow = null;
+  self._textShadow = null;
   self._font = null;
 
   self.getText          = function () { return self._text; }
   self.getTextAlignment = function () { return self._textAlignment; }
   self.getTextColor     = function () { return self._textColor; }
-  self.getShadow        = function () { return self._shadow; }
+  self.getTextShadow    = function () { return self._textShadow; }
   self.getFont          = function () { return self._font; }
 
   self.__defineGetter__("text", self.getText);
   self.__defineGetter__("textAlignment", self.getTextAlignment);
   self.__defineGetter__("textColor", self.getTextColor);
-  self.__defineGetter__("shadow", self.getShadow);
+  self.__defineGetter__("textShadow", self.getTextShadow);
   self.__defineGetter__("font", self.getFont);
 
   self.setText = function ( theText )
@@ -106,13 +106,13 @@ UI.Label = function ()
   }
   self.__defineSetter__("textAlignment", self.setTextAlignment);
 
-  self.setShadow = function ( theShadow )
+  self.setTextShadow = function ( theShadow )
   {
     self._shadow = UI.copyShadow( theShadow );
-    UI._applyShadowToElement ( self._element, theShadow );
-    self.notify ( "shadowDidChange" );
+    UI._applyShadowToElementAsTextShadow ( self._element, theShadow );
+    self.notify ( "textShadowDidChange" );
   }
-  self.__defineSetter__("shadow", self.setShadow);
+  self.__defineSetter__("textShadow", self.setTextShadow);
 
   self.setFont = function ( theFont )
   {
@@ -145,7 +145,7 @@ UI.Label = function ()
     if (options.text)            { self.text = options.text; }
     if (options.textColor)       { self.textColor = options.textColor; }
     if (options.textAlignment)   { self.textAlignment = options.textAlignment; }
-    if (options.shadow)          { self.shadow = options.shadow; }
+    if (options.textShadow)          { self.textShadow = options.textShadow; }
     if (options.font)            { self.font = options.font; }
   };
 
