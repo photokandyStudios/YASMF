@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>demo/platforms/android/assets/www/framework/ui-base.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: demo/platforms/android/assets/www/framework/ui-base.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/******************************************************************************
+ *
+ * UI-BASE
+ * Author: Kerri Shotts
+ * Version: 0.3
+ *
+ * This provides the basics of the UI model, including poings, rects, and more.
+ *
+ ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global PKUTIL, PKDEVICE */
+PKUTIL.require ( [&quot;PKUTIL&quot;, &quot;PKDEVICE&quot;], function () 
+{ 
+    PKUTIL.export ( [ &quot;UI&quot;, &quot;UI.COLOR&quot;, &quot;UI.FONT&quot;, &quot;UI.SHADOW&quot; ] );
+});
+
+var UI = UI || {};
+UI.version = { major: 0, minor: 3, rev: 100 };
+
+/**
+ *
+ * Points are of the form { x: #, y: # }
+ *
+ */
+UI.makePoint = function ( x, y )
+{
+    return { x: x, y: y };
+};
+UI.copyPoint = function ( point )
+{
+  return UI.makePoint ( point.x, point.y );
+};
+/**
+ *
+ * offsets a point by the values in another point. For example,
+ * if pointA = { x:100, y:100 } and pointB = { x:-5, y:10 }, the
+ * returned point will be { x:95, y:110 }.
+ *
+ */
+UI.offsetPoint = function ( pointA, pointB )
+{
+  return UI.makePoint ( pointA.x + pointB.x, pointA.y + pointB.y );
+};
+
+/**
+ *
+ * Sizes are similar to points, but they are of the form
+ * { w: width, h: height }
+ *
+ */
+UI.makeSize = function ( w, h )
+{
+    return { w: w, h: h };
+};
+UI.makeSizeFromPoint = function ( point )
+{
+  return { w: point.x, h: point.y };
+}
+UI.sizeFromRect = function (rect)
+{
+  return { w: rect.size.w, h: rect.size.h };
+}
+UI.copySize = function ( size )
+{
+  return UI.makeSize ( size.w, size.h );
+};
+UI.offsetSize = function ( sizeA, sizeB )
+{
+  return UI.makeSize ( sizeA.w + sizeB.w, sizeA.h + sizeB.h );
+};
+
+/**
+ *
+ * Rects are of the form { origin: point, size: size }, or
+ * { origin: {x: #, y: #}, size: {w: width, h: height} }
+ *
+ */
+UI.makeRect = function ( origin, size )
+{
+    return { origin: { x: origin.x, y: origin.y },
+            size: { w: size.w, h: size.h } };
+};
+UI.copyRect = function ( rect )
+{
+  return UI.makeRect ( rect.origin, rect.size );
+};
+
+/**
+ *
+ * Offsets a rect&#x27;s origin point by the supplied point.
+ *
+ */
+UI.offsetRectByPoint = function ( rectA, pointB )
+{
+  return UI.makeRect ( UI.offsetPoint (rectA.origin, pointB), rectA.size );
+};
+
+/**
+ *
+ * Offsets a rect&#x27;s origin by the origin of the second rect,
+ * and offsets the rect&#x27;s size by the size of the second rect.
+ *
+ * This implies that the second rect does not need to be &quot;real&quot;,
+ * as in, it can have negative sizes and such.
+ *
+ */
+UI.offsetRectByRect = function ( rectA, rectB )
+{
+  return UI.makeRect ( UI.offsetPoint (rectA.origin, rectB.origin), 
+                       UI.offsetSize (rectA.size, rectB.size) );
+};
+
+/**
+ *
+ * Returns true if the two rects supplied intersect. Note that this
+ * will not work if the rectangles are non-canonical.
+ *
+ */
+UI.doRectsIntersect = function ( rectA, rectB )
+{
+  //http://codesam.blogspot.com/2011/02/check-if-two-rectangles-intersect.html
+  var r1tlx = rectA.origin.x;
+  var r2brx = rectB.origin.x + rectB.size.w;
+  var r1brx = rectA.origin.x + rectA.size.w;
+  var r2tlx = rectB.origin.x;
+  var r1tly = rectA.origin.y;
+  var r2bry = rectB.origin.y + rectB.size.h;
+  var r1bry = rectA.origin.y + rectA.size.h;
+  var r2tly = rectB.origin.y;
+  // corrected for Y axis
+  if ( r1tlx &gt;= r2brx || r1brx &lt;= r2tlx || r1tly &gt;= r2bry || r1bry &lt;= r2tly) 
+  {
+    return false;
+  }
+  return true;
+};
+
+/**
+ *
+ * Think of these as constants, except you have to call them like a 
+ * method.
+ *
+ * zeroPoint() returns a point of {0,0}
+ * zeroSize() returns a size of {0,0}
+ * zeroRect() returns a rect of { {0,0}, {0,0} }
+ * screenSize() returns a **point** representing the size of the screen (or browser).
+ * screenBounds() returns a **rect** representing the size of the screen (with a {0,0} origin).
+ *
+ */
+UI.zeroPoint = function () { return UI.makePoint ( 0, 0 ); };
+UI.zeroSize = function () { return UI.makeSize ( 0, 0 ); };
+UI.zeroRect = function () { return UI.makeRect ( UI.zeroPoint(), UI.zeroSize() ); };
+UI.screenSize = function () { return UI.makeSize ( window.innerWidth, window.innerHeight ); };
+UI.screenBounds = function () { return UI.makeRect ( UI.zeroPoint(), UI.screenSize() ); };
+
+/**
+ *
+ * fonts
+ *
+ */
+
+UI.makeFont = function ( theFontFamily, theFontSize, theFontWeight )
+{
+  return { family: theFontFamily,
+             size: theFontSize,
+           weight: theFontWeight || &quot;normal&quot;
+         };
+}
+UI.copyFont = function ( theFont )
+{
+  return UI.makeFont ( theFont.family, theFont.size, theFont.weight );
+}
+UI.copyFontWithNewSize = function ( theFont, theNewSize )
+{
+  return UI.makeFont ( theFont.family, theNewSize, theFont.weight );
+}
+UI.copyFontWithNewSizeDelta = function ( theFont, theNewSizeDelta )
+{
+  return UI.makeFont ( theFont.family, theFont.size + theNewSizeDelta, theFont.weight );
+}
+UI.copyFontWithPercentSize = function ( theFont, theSizePercent )
+{
+  return UI.makeFont ( theFont.family, theFont.size * theSizePercent, theFont.weight );
+}
+UI._applyFontToElement = function ( theElement, theFont )
+{
+  if (theFont)
+  {
+    theElement.style.fontFamily = theFont.family;
+    theElement.style.fontSize = &quot;&quot; + theFont.size + &quot;px&quot;;
+    theElement.style.fontWeight = theFont.weight;
+  }
+  else
+  {
+    theElement.style.fontFamily = &quot;inherit&quot;;
+    theElement.style.fontSize = &quot;inherit&quot;;
+    theElement.style.fontWeight = &quot;inherit&quot;;
+  }
+}
+
+UI.FONT = UI.FONT || {};
+UI.FONT.systemFont = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeFont ( &quot;Helvetica, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    case &quot;android&quot;: return UI.makeFont ( &quot;Roboto, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    case &quot;wince&quot;: return UI.makeFont ( &quot;Segoe, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    default: return UI.makeFont ( &quot;sans-serif&quot;, 20, &quot;normal&quot; );
+  }
+}
+UI.FONT.boldSystemFont = function ()
+{
+  var theSystemFont = UI.copyFont( UI.FONT.systemFont() );
+  theSystemFont.weight = &quot;bold&quot;;
+  return theSystemFont;
+}
+
+/**
+ *
+ * Shadows
+ *
+ */
+UI.makeShadow = function ( theVisibility, theColor, theOffset, theBlur, theSpread, theType )
+{
+  return { visible: theVisibility, color: UI.copyColor(theColor), offset: UI.copyPoint ( theOffset ), 
+           blur: theBlur || 0, spread: theSpread || 0, type: theType || &quot;&quot; };
+}
+UI.copyShadow = function ( theShadow )
+{
+  return UI.makeShadow ( theShadow.visible, theShadow.color, theShadow.offset, theShadow.blur, theShadow.spread, theShadow.type );
+}
+UI._applyShadowToElementAsTextShadow = function ( theElement, theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      theElement.style.textShadow = &quot;&quot; + theShadow.offset.x + &quot;px &quot; +
+                                         theShadow.offset.y + &quot;px &quot; +
+                                         theShadow.blur + &quot;px &quot; +
+                                         UI._colorToRGBA(theShadow.color) + &quot;&quot;;
+    }
+    else
+    {
+      theElement.style.textShadow = &quot;inherit&quot;;
+    }
+  }
+  else
+  {
+    theElement.style.textShadow = &quot;inherit&quot;;
+  }    
+}
+UI._shadowToBoxShadow = function (  theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      return  &quot;&quot; +  theShadow.type + &quot; &quot; + theShadow.offset.x + &quot;px &quot; +
+                                         theShadow.offset.y + &quot;px &quot; +
+                                         theShadow.blur + &quot;px &quot; +
+                                         theShadow.spread + &quot;px &quot; + 
+                                         UI._colorToRGBA(theShadow.color) + &quot;&quot;;
+    }
+    else
+    {
+      return  &quot;inherit&quot;;
+    }
+  }
+  else
+  {
+    return  &quot;inherit&quot;;
+  }    
+}
+UI.SHADOW = UI.SHADOW || {};
+UI.SHADOW.defaultDarkShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeShadow ( true, &quot;rgba(0,0,0,0.25)&quot;, UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, &quot;#000&quot;, UI.zeroPoint(), 0 );
+  }
+}
+UI.SHADOW.defaultLightShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeShadow ( true, &quot;rgba(255,255,255,0.75)&quot;, UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, &quot;#FFF&quot;, UI.zeroPoint(), 0 );
+  }
+}
+
+/**
+ *
+ * Colors
+ *
+ */
+UI._colorToRGBA = function ( theColor )
+{
+  if (!theColor)
+  {
+    return &quot;inherit&quot;;
+  }
+  if (theColor.alpha !== 0)
+  {
+    return &quot;rgba(&quot; + theColor.red + &quot;,&quot; + theColor.green + &quot;,&quot; + theColor.blue + &quot;,&quot; + theColor.alpha + &quot;)&quot;;
+  }
+  else
+  {
+    return &quot;transparent&quot;;
+  }
+}
+UI.makeColor = function ( r, g, b, a )
+{
+  return { red: r, green: g, blue: b, alpha: a };
+}
+UI.copyColor = function (theColor)
+{
+  return UI.makeColor ( theColor.red, theColor.green, theColor.blue, theColor.alpha );
+}
+UI.COLOR = UI.COLOR || {};
+UI.COLOR.blackColor     = function () { return UI.makeColor (   0,   0,   0, 1.0 ); }
+UI.COLOR.darkGrayColor  = function () { return UI.makeColor (  85,  85,  85, 1.0 ); }
+UI.COLOR.GrayColor      = function () { return UI.makeColor ( 127, 127, 127, 1.0 ); }
+UI.COLOR.lightGrayColor = function () { return UI.makeColor ( 170, 170, 170, 1.0 ); }
+UI.COLOR.whiteColor     = function () { return UI.makeColor ( 255, 255, 255, 1.0 ); }
+UI.COLOR.blueColor      = function () { return UI.makeColor (   0,   0, 255, 1.0 ); }
+UI.COLOR.greenColor     = function () { return UI.makeColor (   0, 255,   0, 1.0 ); }
+UI.COLOR.redColor       = function () { return UI.makeColor ( 255,   0,   0, 1.0 ); }
+UI.COLOR.cyanColor      = function () { return UI.makeColor (   0, 255, 255, 1.0 ); }
+UI.COLOR.yellowColor    = function () { return UI.makeColor ( 255, 255,   0, 1.0 ); }
+UI.COLOR.magentaColor   = function () { return UI.makeColor ( 255,   0, 255, 1.0 ); }
+UI.COLOR.orangeColor    = function () { return UI.makeColor ( 255, 127,   0, 1.0 ); }
+UI.COLOR.purpleColor    = function () { return UI.makeColor ( 127,   0, 127, 1.0 ); }
+UI.COLOR.brownColor     = function () { return UI.makeColor ( 153, 102,  51, 1.0 ); }
+UI.COLOR.lightTextColor = function () { return UI.makeColor ( 240, 240, 240, 1.0 ); }
+UI.COLOR.darkTextColor  = function () { return UI.makeColor (  15,  15,  15, 1.0 ); }
+UI.COLOR.clearColor     = function () { return UI.makeColor (   0,   0,   0, 0.0 ); }
+
+/**
+ *
+ * Images
+ *
+ */
+
+UI.makeImage = function ( thePathToTheImage, theImageSize, options )
+{
+  var theRatio = window.devicePixelRatio;
+  var theNewImageSize = null
+  if (theImageSize)
+  {
+    theNewImageSize = UI.copySize( theImageSize );
+  }
+  var aNewImage = { image: thePathToTheImage, 
+                    imageSize : theNewImageSize,
+                    targetSize: null,
+                    repeat: options.repeat || &quot;no-repeat&quot;,
+                    position: options.position || &quot;top left&quot;,
+                    sizing: options.sizing || &quot;&quot;,
+                    imageType: options.imageType || &quot;url&quot; }; // url, gradient, etc.
+  //UI.recalcImageSize ( aNewImage );
+  return aNewImage;
+}
+/*UI.recalcImageSize = function ( theImage )
+{
+  var theRatio = window.devicePixelRatio || 1;
+  if (theImage.imageSize)
+  {
+    var theTargetSize = UI.makeSize ( theImage.imageSize.w / theRatio,
+                                      theImage.imageSize.h / theRatio );
+    theImage.targetSize = theTargetSize;
+  }
+}*/
+UI.copyImage = function ( theImage )
+{
+  return UI.makeImage ( theImage.image, theImage.imageSize,
+                        { repeat: theImage.repeat, position: theImage.position, sizing: theImage.sizing,
+                          imageType: theImage.imageType } );
+}
+UI._applyImageToElement = function ( theElement, theImage )
+{
+  if (!theImage)
+  {
+    theElement.style.backgroundImage = &quot;&quot;;
+    theElement.style.backgroundPosition = &quot;&quot;;
+    theElement.style.backgroundSize = &quot;&quot;;
+    theElement.style.backgroundRepeat = &quot;&quot;;
+    return;
+  }
+  if (theImage.imageType == &quot;url&quot;)
+  {
+      theElement.style.backgroundImage = &quot;url(&quot; + theImage.image + &quot;)&quot;;
+  }
+  else
+  {
+    theElement.style.backgroundImage = theImage.image;
+  }
+  if (theImage.sizing !== &quot;&quot;)
+  {
+    theElement.stle.backgroundSize = theImage.sizing; // cover, contain
+  }
+  else
+  {
+    if (theImage.imageSize)
+    {
+      theElement.style.backgroundSize = &quot;&quot; + 
+       ((theImage.imageSize.w&gt;-1) ? theImage.imageSize.w + &quot;px &quot; : &quot;auto &quot;) + 
+       ((theImage.imageSize.h&gt;-1) ? theImage.imageSize.h + &quot;px&quot; : &quot;auto&quot; );
+    }
+    else
+    {
+      theElement.style.backgroundSize = &quot;&quot;;
+    }
+  }
+  theElement.style.backgroundPosition = theImage.position;
+  theElement.style.backgroundRepeat = theImage.repeat;
+}
+UI.makeLinearGradientImage = function ( gradientOrigin, colorStops )
+{
+  var gradientString = &quot;-webkit-linear-gradient(&quot; + gradientOrigin + &quot;, &quot;;
+  for (var i=0; i&lt;colorStops.length; i++)
+  {
+    gradientString += UI._colorToRGBA(colorStops[i].color) + &quot; &quot; + (colorStops[i].position || &quot;&quot;);
+    if (i&lt;colorStops.length-1)
+    {
+      gradientString += &quot;, &quot;
+    }
+  }
+  gradientString += &quot;)&quot;;
+  return UI.makeImage ( gradientString, null, { imageType: &quot;gradient&quot; } );
+}
+UI.makeSimpleLinearGradientImage = function ( gradientOrigin, color1, color1Position, color2, color2Position )
+{
+  return UI.makeLinearGradientImage ( gradientOrigin, [ {color: color1, position: color1Position},
+                                                        {color: color2, position: color2Position} ] );
+}
+/**
+ *
+ * borders
+ *
+ */
+UI.makeBorderForSide = function ( theBorderColor, theBorderStyle, theBorderStrokeWidth )
+{
+  var theNewColor = null;
+  if (theBorderColor) { theNewColor = UI.copyColor(theBorderColor); }
+
+  return { color: theNewColor, style: theBorderStyle || &quot;inherit&quot;, width: theBorderStrokeWidth || &quot;inherit&quot;};
+}
+UI.copyBorderForSide = function ( theBorderForSide )
+{
+  return UI.makeBorderForSide (theBorderForSide.color, theBorderForSide.style, theBorderForSide.width );
+}
+UI.makeBorder = function ( borders, borderRadii )
+{
+  var theBorder = { color: null, style: &quot;inherit&quot;, width: 0 };
+  if (borders)
+  {
+    if (borders.color) { theBorder.color = UI.copyColor(borders.color); }
+    if (borders.style) { theBorder.style = borders.style  }
+    if (borders.width) { theBorder.width = borders.width  }
+    if (borders.top) { theBorder.top = UI.copyBorderForSide(borders.top); }
+    if (borders.left) { theBorder.left = UI.copyBorderForSide(borders.left); }
+    if (borders.right) { theBorder.right = UI.copyBorderForSide(borders.right); }
+    if (borders.bottom) { theBorder.bottom = UI.copyBorderForSide(borders.bottom); }
+  }
+  if (borderRadii)
+  {
+    theBorder.topLeftBorderRadius = borderRadii.topLeftBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.topRightBorderRadius = borderRadii.topRightBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.bottomLeftBorderRadius = borderRadii.bottomLeftBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.bottomRightBorderRadius = borderRadii.bottomRightBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+  }
+  else
+  {
+    theBorder.topLeftBorderRadius = &quot;inherit&quot;;
+    theBorder.topRightBorderRadius = &quot;inherit&quot;;
+    theBorder.bottomLeftBorderRadius = &quot;inherit&quot;;
+    theBorder.bottomRightBorderRadius = &quot;inherit&quot;;
+  }
+  return theBorder;
+}
+UI.copyBorder = function ( borders )
+{
+  return UI.makeBorder ( borders, { topLeftBorderRadius: borders.topLeftBorderRadius, 
+                                    topRightBorderRadius: borders.topRightBorderRadius,
+                                    bottomLeftBorderRadius: borders.bottomLeftBorderRadius, 
+                                    bottomRightBorderRadius: borders.bottomRightBorderRadius } );
+}
+UI._applyBorderToElement = function ( theElement, theBorder )
+{
+  // over-arching
+  if ( theBorder.color ) { theElement.style.borderColor = UI._colorToRGBA(theBorder.color); }
+                    else { theElement.style.borderColor = &quot;&quot; }
+  if ( theBorder.style !== &quot;inherit&quot; ) { theElement.style.borderStyle = theBorder.style; }
+                                  else { theElement.style.borderStyle = &quot;&quot;; }
+  if ( theBorder.width !== &quot;inherit&quot; ) { theElement.style.borderWidth = &quot;&quot; + theBorder.width + &quot;px&quot;; }
+                                  else { theElement.style.borderWidth = &quot;&quot;; }
+  // and now, the specifics
+  if ( theBorder.left )
+  {
+    if (theBorder.left.color) { theElement.style.borderLeftColor = UI._colorToRGBA(theBorder.left.color); }
+    if ( theBorder.left.style !== &quot;inherit&quot; ) { theElement.style.borderLeftStyle = theBorder.left.style; }
+    if ( theBorder.left.width !== &quot;inherit&quot; ) { theElement.style.borderLeftWidth = &quot;&quot; + theBorder.left.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.top )
+  {
+    if (theBorder.top.color) { theElement.style.borderTopColor = UI._colorToRGBA(theBorder.top.color); }
+    if ( theBorder.top.style !== &quot;inherit&quot; ) { theElement.style.borderTopStyle = theBorder.top.style; }
+    if ( theBorder.top.width !== &quot;inherit&quot; ) { theElement.style.borderTopWidth = &quot;&quot; + theBorder.top.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.right )
+  {
+    if (theBorder.right.color) { theElement.style.borderRightColor = UI._colorToRGBA(theBorder.right.color); }
+    if ( theBorder.right.style !== &quot;inherit&quot; ) { theElement.style.borderRightStyle = theBorder.right.style; }
+    if ( theBorder.right.width !== &quot;inherit&quot; ) { theElement.style.borderRightWidth = &quot;&quot; + theBorder.right.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.bottom )
+  {
+    if (theBorder.bottom.color) { theElement.style.borderBottomColor = UI._colorToRGBA(theBorder.bottom.color); }
+    if ( theBorder.bottom.style !== &quot;inherit&quot; ) { theElement.style.borderBottomStyle = theBorder.bottom.style; }
+    if ( theBorder.bottom.width !== &quot;inherit&quot; ) { theElement.style.borderBottomWidth = &quot;&quot; + theBorder.bottom.width + &quot;px&quot;; }
+  }
+
+  // border radii
+  theElement.style.borderTopLeftRadius = theBorder.topLeftBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.topLeftBorderRadius + &quot;px&quot;;
+  theElement.style.borderTopRightRadius = theBorder.topRightBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.topRightBorderRadius + &quot;px&quot;;
+  theElement.style.borderBottomLeftRadius = theBorder.bottomLeftBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.bottomLeftBorderRadius + &quot;px&quot;;
+  theElement.style.borderBottomRightRadius = theBorder.bottomRightBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.bottomRightBorderRadius + &quot;px&quot;;
+}
+/**
+ *
+ * events
+ *
+ */
+UI.makeEvent = function ( e )
+{
+  var newEvent = { _originalEvent: e, touches: [], x: -1, y: -1, avgX: -1, avgY: -1 };
+  if (e.touches)
+  {
+    var avgXTotal = 0;
+    var avgYTotal = 0;
+    for (var i=0; i&lt;e.touches.length; i++)
+    {
+      newEvent.touches.push ( { x: e.touches[i].clientX, y: e.touches[i].clientY } );
+      avgXTotal += e.touches[i].clientX;
+      avgYTotal += e.touches[i].clientY;
+      if (i===0)
+      {
+        newEvent.x = e.touches[i].clientX;
+        newEvent.y = e.touches[i].clientY;
+      }
+    }
+    if (e.touches.length&gt;0)
+    {
+      newEvent.avgX = avgXTotal / e.touches.length;
+      newEvent.avgY = avgYTotal / e.touches.length;
+    }
+  }
+  else
+  {
+    if (event.pageX)
+    {
+      newEvent.touches.push ( { x: e.pageX, y: e.pageY } );
+      newEvent.x = e.pageX;
+      newEvent.y = e.pageY;
+      newEvent.avgX = e.pageX;
+      newEvent.avgY = e.pageY;
+    }
+  }
+  return newEvent;
+}
+
+UI.cancelEvent = function ( e )
+{
+  if (e._originalEvent.cancelBubble)
+  {
+    e._originalEvent.cancelBubble();
+  }
+  if (e._originalEvent.stopPropagation)
+  {
+    e._originalEvent.stopPropagation();
+  }
+  if (e._originalEvent.preventDefault)
+  {
+    e._originalEvent.preventDefault();
+  } else
+  {
+    e._originalEvent.returnValue = false;
+  }
+}
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

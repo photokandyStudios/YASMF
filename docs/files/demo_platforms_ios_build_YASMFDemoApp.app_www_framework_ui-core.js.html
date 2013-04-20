@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>demo/platforms/ios/build/YASMFDemoApp.app/www/framework/ui-core.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: demo/platforms/ios/build/YASMFDemoApp.app/www/framework/ui-core.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/******************************************************************************
+ *
+ * UI-CORE
+ * Author: Kerri Shotts
+ *
+ * This script provides a lot of the core user interface framework, such as
+ * loading content via AJAX, transitions, and more.
+ *
+ ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global device, PKDEVICE, PKUTIL, $ge, cordova, console*/
+PKUTIL.require ( [&quot;PKUTIL&quot;, &quot;PKDEVICE&quot;], function () 
+{ 
+    PKUTIL.export ( [ &quot;PKUI&quot;, &quot;PKUI.CORE&quot;] );
+});
+
+var PKUI = PKUI ||
+{
+};
+// create the namespace
+PKUI.version = { major: 0, minor: 3, rev: 100 };
+
+PKUI.CORE = PKUI.CORE ||
+{
+}// create the CORE space
+PKUI.CORE.TABBAR = PKUI.CORE.TABBAR ||
+{
+};
+
+//
+// Properties
+//
+PKUI.CORE.consoleLogging = false;
+// If TRUE, we&#x27;ll write UI logs out to the console.
+PKUI.CORE.viewStack = Array();
+// Contains the view stack
+PKUI.CORE.currentView = null;
+// Points at the /current/ view
+PKUI.CORE.useTransforms = true; //true;
+// animation; if true, uses 3D transforms
+PKUI.CORE.jsaInterval = 16;
+
+// if true, use animation when popping and pushing views
+PKUI.CORE.animate = true;
+
+// if true, install a global back button handler
+PKUI.CORE.captureBackButton = true;
+// used to keep track of the last time a back button was pressed
+PKUI.CORE._lastBackButtonTime = -1;
+
+// the interval to use when calling applyTouchListeners automatically.
+// If 0, they will not be called, and must be called manually after
+// every DOM change. 
+PKUI.CORE.listenerInterval = 100;
+
+// Determines how push,pop,swap, etc., are handled
+// if &quot;fullscreen&quot;, all views take up the entire screen.
+// if &quot;column&quot;, all views take up the _columnWidth specified
+//              in the view.
+PKUI.CORE.viewHandlingMethod = &quot;fullscreen&quot;;
+
+
+//
+// Methods
+//
+
+/**
+ *
+ * Global back button handler, since doing it per-view and per-
+ * message is buggy. This will call backButtonPressed() on any
+ * active message or view. If said method isn&#x27;t found, it will
+ * pop the view on its own.
+ *
+ * NOTE: if backButtonPressed() is defined, it is expected to
+ * pop the view, if the method is also a view. If the view is
+ * not popped, the back button will have no effect.
+ *
+ * SECOND NOTE: Since back buttons received in quick succession
+ * are problematic, we force the user to wait 1s before the next
+ * back button is accepted.
+ *
+ */
+PKUI.CORE.handleBackButton = function ()
+{
+  var currentTime = (new Date()).getTime();
+  if (PKUI.CORE._lastBackButtonTime &lt; currentTime - 1000)
+  {
+    PKUI.CORE._lastBackButtonTime = (new Date()).getTime();
+    if (PKUI.MESSAGE)
+    {
+      if (!PKUI.MESSAGE.captureBackButton)
+      {
+        if (PKUI.MESSAGE.currentMessage)
+        {
+          PKUI.MESSAGE.currentMessage.backButtonPressed();
+          return;
+        }
+      }
+    }
+
+    if (PKUI.CORE.currentView.backButtonPressed)
+    {
+      PKUI.CORE.currentView.backButtonPressed();
+    }
+    else
+    {
+      PKUI.CORE.popView();
+    }
+  }
+}
+
+/**
+ *
+ * Initializes the application framework
+ *  - in this version of the framework, we force an orientation update.
+ *  - by default, we attach a global back button handler
+ *  - we deisable animations and transforms for Android and WP7.
+ */
+PKUI.CORE.initializeApplication = function()
+{
+
+  // check (and update) our current device orientation
+  PKUI.CORE.updateOrientation();
+
+  // add the event listener...
+  window.addEventListener(&#x27;orientationchange&#x27;, PKUI.CORE.updateOrientation, false);
+
+  // do we capture the back button?
+  if (PKUI.CORE.captureBackButton)
+  {
+    document.addEventListener(&#x27;backbutton&#x27;, PKUI.CORE.handleBackButton, false);
+  }
+
+  // determine if we should use 3D transforms for animation or not
+  if (device.platform == &quot;Android&quot;)
+  {
+    PKUI.CORE.animate = false;
+    PKUI.CORE.useTransforms = false;
+/*    if (parseInt(device.version.substr(0, 2)) &lt; 3)
+    {
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;NOTICE: DISABLING 3D TRANSFORMS&quot;);
+      }
+      PKUI.CORE.useTransforms = true;
+    }*/
+  }
+
+  if (device.platform == &quot;WinCE&quot;)
+  {
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;NOTICE: DISABLING 3D TRANSFORMS&quot;);
+    }
+    PKUI.CORE.useTransforms = false;
+  }
+
+}
+
+/**
+ *
+ * Called on first-start and whenever the orientation changes. It updates the
+ * body&#x27;s class to reflect the device, formfactor, orientation, and scaling.
+ *
+ */
+PKUI.CORE.updateOrientation = function()
+{
+  var curDevice;
+  var curOrientation;
+  var curFormFactor;
+  var curScale;
+  var curConvenience;
+
+  curDevice = PKDEVICE.platform();
+  curFormFactor = PKDEVICE.formFactor();
+  curOrientation = PKDEVICE.isPortrait() ? &quot;portrait&quot; : &quot;landscape&quot;;
+  curScale = PKDEVICE.isRetina() ? &quot;hiDPI&quot; : &quot;loDPI&quot;;
+  curConvenience = &quot;&quot;;
+  if (PKDEVICE.iPad()) { curConvenience = &quot;ipad&quot;; }
+  if (PKDEVICE.iPhone()) { curConvenience = &quot;iphone&quot;; }
+  if (PKDEVICE.droidTablet()) { curConvenience = &quot;droid-tablet&quot;; }
+  if (PKDEVICE.droidPhone()) { curConvenience = &quot;droid-phone&quot;; }
+
+  document.body.setAttribute(&quot;class&quot;, curDevice + &quot; &quot; + curFormFactor + &quot; &quot; + curOrientation + &quot; &quot; + curScale + &quot; &quot; + curConvenience);
+}
+
+/*
+ * Debugging aid. Displays the view stack as well as marking the current view.
+ * Renders like this:
+ *
+ *    VIEW STACK DUMP as of 12:36:12
+ *      An optional message
+ *        [0]: (H) testView0
+ *        [1]: (H) testView1
+ *        [2]: (H) testView2
+ *        [3]: (V) testView3 =CURRENT=
+ *    END VIEW STACK DUMP
+ *
+ * (H) = hidden; (V) = visible; =CURRENT= = the top view on the stack
+ */
+PKUI.CORE.dumpViewStack = function( msg )
+{
+  console.log (&quot;VIEW STACK DUMP as of &quot; + (__D((new Date()),&quot;hh:mm:ss&quot;)));
+
+  if (msg) { console.log (&quot;  &quot; + msg); }
+
+  for (var view in PKUI.CORE.viewStack)
+  {
+    console.log ( &quot;    [&quot; + view + &quot;]: &quot; +
+                  (PKUI.CORE.viewStack[view].style.display == &quot;block&quot; ? &quot;(V) &quot; : &quot;(H) &quot;) +
+                  &quot;{ &quot; + PKUI.CORE.viewStack[view].style.left + &quot; &quot; +
+                  PKUI.CORE.viewStack[view].style.maxWidth + &quot; } &quot; +
+                  PKUI.CORE.viewStack[view].getAttribute(&quot;id&quot;) +
+                  (PKUI.CORE.currentView === PKUI.CORE.viewStack[view] ? &quot; =CURRENT= &quot; : &quot;&quot;)
+                );
+  }
+
+  console.log (&quot;END VIEW STACK DUMP&quot;);
+}
+
+/*
+ * Calculate the width of the visible views
+ */
+PKUI.CORE.visibleViewsWidth = function ()
+{
+  var totalWidth = 0;
+  for (var view in PKUI.CORE.viewStack)
+  {
+    if (PKUI.CORE.viewStack[view].style.display == &quot;block&quot;)
+    {
+      if (PKUI.CORE.viewStack[view]._columnWidth)
+      {
+        totalWidth += PKUI.CORE.viewStack[view]._columnWidth;
+      }
+      else
+      {
+        totalWidth += 320;
+      }
+    }
+  }
+  return totalWidth;
+}
+
+/**
+ *
+ * Shows a view and pushes it on the viewStack. NO ANIMATION.
+ * DOES NOT PROPERLY CALL viewWillHide/viewDidHide of any view, since there
+ * may be no view visible.
+ *
+ */
+PKUI.CORE.showView = function(theView)
+{
+  PKUI.CORE.dumpViewStack (&quot;before showView of &quot; + theView.getAttribute(&quot;id&quot;));
+  PKUI.CORE.viewStack.push(theView);
+  PKUI.CORE.currentView = theView;
+
+  if (theView.viewWillAppear)
+  {
+    theView.viewWillAppear();
+  }
+
+  theView.style.display = &quot;block&quot;;
+
+  if (theView.viewDidAppear)
+  {
+    theView.viewDidAppear();
+  }
+  PKUI.CORE.dumpViewStack (&quot;after showView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+}
+/**
+ *
+ * Hides a view and pops it off the viewStack. NO ANIMATION.
+ * DOES NOT ATTEMPT TO CALL viewWillShow or viewDidShow of any view
+ * on the stack, as there may not be any view visible.
+ *
+ */
+PKUI.CORE.hideView = function(theView)
+{
+  PKUI.CORE.dumpViewStack (&quot;before hideView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+  PKUI.CORE.currentView = PKUI.CORE.viewStack.pop();
+  if (theView.viewWillHide)
+  {
+    theView.viewWillHide();
+  }
+  theView.style.display = &quot;none&quot;;
+  if (theView.viewDidHide)
+  {
+    theView.viewDidHide();
+  }
+
+  PKUI.CORE.dumpViewStack (&quot;after hideView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+}
+
+/**
+ *
+ * Swaps a view on the stack with the desired view. NO ANIMATION.
+ *
+ */
+PKUI.CORE.swapView = function (theView)
+{
+  PKUI.CORE.dumpViewStack (&quot;before swapView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+  if (PKUI.CORE.viewHandlingMethod !== &quot;fullscreen&quot;)
+  {
+    if (PKUI.CORE.viewHandlingMethod === &quot;column&quot;)
+    {
+      PKUI.CORE.popColumnView();
+      PKUI.CORE.pushColumnView(theView);
+      PKUI.CORE.dumpViewStack (&quot;after swapView of &quot; + theView.getAttribute(&quot;id&quot;));
+      return;
+    }
+  }
+
+
+  var theViewHiding = PKUI.CORE.viewStack.pop();
+  var theViewShowing = theView;
+  PKUI.CORE.currentView = theViewShowing;
+
+  if (theViewHiding.viewWillHide)    { theViewHiding.viewWillHide(); }
+  if (theViewShowing.viewWillAppear) { theViewShowing.viewWillAppear(); }
+
+  theViewHiding.style.display = &quot;none&quot;;
+  theViewShowing.style.display = &quot;block&quot;;
+  theViewShowing.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+
+
+  PKUI.CORE.viewStack.push(theViewShowing);
+
+  if (theViewShowing.viewDidAppear) { theViewShowing.viewDidAppear(); }
+  if (theViewHiding.viewDidHide)    { theViewHiding.viewDidHide(); }
+
+  PKUI.CORE.dumpViewStack (&quot;after swapView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+}
+
+PKUI.CORE.jsaPush = function(theViewHiding, theViewShowing, duration)
+{
+  var theStartTime = (new Date()).getTime();
+
+  var theAnimationID = setInterval(function()
+  {
+    var theCurrentTime = (new Date()).getTime();
+    var theDelta = theCurrentTime - theStartTime;
+    // #ms between start and now
+    var theProgress = (theDelta / duration) * 100;
+
+    if (theProgress &gt; 100)
+    {
+      theProgress = 100;
+      clearInterval(theAnimationID);
+      // we&#x27;re done animating.
+      return;
+    }
+
+    theViewHiding.style.left = &quot;&quot; + (-theProgress) + &quot;%&quot;;
+    theViewHiding.style.right = &quot;&quot; + (theProgress) + &quot;%&quot;;
+
+    theViewShowing.style.left = &quot;&quot; + (100 - theProgress) + &quot;%&quot;;
+    theViewShowing.style.right = &quot;&quot; + (-(100 - theProgress)) + &quot;%&quot;;
+ 
+  }, PKUI.CORE.jsaInterval);
+}
+
+PKUI.CORE.jsaPop = function(theViewHiding, theViewShowing, duration)
+{
+  var theStartTime = (new Date()).getTime();
+
+  var theAnimationID = setInterval(function()
+  {
+    var theCurrentTime = (new Date()).getTime();
+    var theDelta = theCurrentTime - theStartTime;
+    // #ms between start and now
+    var theProgress = 100 - ((theDelta / duration) * 100);
+
+    if (theProgress &lt; 0)
+    {
+      theProgress = 0;
+      clearInterval(theAnimationID);
+      // we&#x27;re done animating.
+      return;
+    }
+    theViewShowing.style.left = &quot;&quot; + (-theProgress) + &quot;%&quot;;
+    theViewShowing.style.right = &quot;&quot; + (theProgress) + &quot;%&quot;;
+
+    theViewHiding.style.left = &quot;&quot; + (100 - theProgress) + &quot;%&quot;;
+    theViewHiding.style.right = &quot;&quot; + (-(100 - theProgress)) + &quot;%&quot;;
+  }, PKUI.CORE.jsaInterval);
+}
+
+PKUI.CORE.pushColumnView = function (theView)
+{
+  theView.style.maxWidth = &quot;&quot; + (theView._columnWidth || 320) + &quot;px&quot;;
+  theView.style.minWidth = &quot;&quot; + (theView._columnWidth || 320) + &quot;px&quot;;
+  theView.style.left = &quot;&quot; + PKUI.CORE.visibleViewsWidth() + &quot;px&quot;;
+  theView.style.display = &quot;block&quot;;
+  theView.style.zIndex = PKUI.CORE.viewStack.length+1;
+
+  if (theView.viewWillAppear) { theView.viewWillAppear(); }
+  if (theView.viewDidAppear)  { theView.viewDidAppear(); }
+
+  PKUI.CORE.viewStack.push (theView);
+  PKUI.CORE.currentView = theView;
+
+  theView.parentElement.scrollLeft = PKUI.CORE.visibleViewsWidth();
+
+  PKUI.CORE.dumpViewStack ( &quot;after pushColumnView of &quot; + theView.getAttribute(&quot;id&quot;) );
+
+}
+
+PKUI.CORE.popColumnView = function (theView)
+{
+  // if theView is null, we assume the last view on the stack
+  var theViewToPop = theView || PKUI.CORE.currentView;
+  var theIndex = -1;
+  theViewToPop.style.display = &quot;none&quot;;
+
+  for (var i=0; i&lt;PKUI.CORE.viewStack.length; i++)
+  {
+    if (PKUI.CORE.viewStack[i] === theViewToPop)
+    {
+       theIndex = i;
+    }
+  }
+
+  if (theIndex &gt; -1)
+  {
+    PKUI.CORE.viewStack.splice( theIndex, 1);
+  }
+
+  if (theIndex &lt; PKUI.CORE.viewStack.length)
+  {
+    PKUI.CORE.currentView = PKUI.CORE.viewStack[theIndex];
+  }
+  else
+  {
+    if (theIndex-1 &gt; -1)
+    {
+      PKUI.CORE.currentView = PKUI.CORE.viewStack[theIndex-1];
+    }
+    else
+    {
+      PKUI.CORE.currentView = null;
+    }
+  }
+
+  var theNewLeft = 0;
+  for (i=0; i&lt;PKUI.CORE.viewStack.length; i++)
+  {
+    PKUI.CORE.viewStack[i].style.left = &quot;&quot; + theNewLeft + &quot;px&quot;;
+    PKUI.CORE.viewStack[i].style.zIndex = i;
+    theNewLeft += ( PKUI.CORE.viewStack[i]._columnWidth || 320 );
+  }
+
+  if (theViewToPop.viewWillHide) { theViewToPop.viewWillHide(); }
+  if (theViewToPop.viewDidHide) { theViewToPop.viewDidHide(); }
+
+  theViewToPop.parentElement.scrollLeft = PKUI.CORE.visibleViewsWidth();
+
+  PKUI.CORE.dumpViewStack ( &quot;after popColumnView of &quot; + theViewToPop.getAttribute(&quot;id&quot;) );
+
+}
+
+PKUI.CORE.popToView = function (theView)
+{
+  var theViewIndex = 0;
+  for (var i=0; i&lt;PKUI.CORE.viewStack.length; i++)
+  {
+    if (PKUI.CORE.viewStack[i] === theView)
+    {
+      theViewIndex = i;
+    }
+  }
+  for (i=PKUI.CORE.viewStack.length-1;i&gt;theViewIndex;i--)
+  {
+    PKUI.CORE.viewStack[i].style.display = &quot;none&quot;;
+    if (PKUI.CORE.viewStack[i].viewWillHide) { PKUI.CORE.viewStack[i].viewWillHide(); }
+    if (PKUI.CORE.viewStack[i].viewDidHide) { PKUI.CORE.viewStack[i].viewDidHide(); }
+  }
+  PKUI.CORE.viewStack.splice( theViewIndex+1, PKUI.CORE.viewStack.length-theViewIndex-1 );
+  PKUI.CORE.currentView = PKUI.CORE.viewStack[PKUI.CORE.viewStack.length-1];
+
+  PKUI.CORE.dumpViewStack (&quot;after popToView&quot;);
+}
+
+/**
+ *
+ * Shows a view WITH ANIMATION and pushes it onto the view stack.
+ * The animation is a slide from right to left.
+ *
+ */
+PKUI.CORE.pushView = function(theView)
+{
+  PKUI.CORE.dumpViewStack (&quot;before pushView of &quot; + theView.getAttribute(&quot;id&quot;));
+  // tell theView we&#x27;re going to appear
+
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;Pushing View: &quot; + theView.getAttribute(&quot;id&quot;));
+  }
+
+  var theViewHiding = PKUI.CORE.currentView;
+  var theViewShowing = theView;
+
+  if (theViewShowing == theViewHiding)
+  {
+    console.log (&quot;Pushing the same view!&quot;);
+    return;
+  }
+
+  if (PKUI.CORE.viewHandlingMethod !== &quot;fullscreen&quot;)
+  {
+    if (PKUI.CORE.viewHandlingMethod === &quot;column&quot;)
+    {
+      PKUI.CORE.pushColumnView ( theView );
+      return;
+    }
+  }
+
+  if (!PKUI.CORE.animate)
+  {
+    $ge(&quot;preventClicks&quot;).style.display = &quot;block&quot;;
+    // switch views with no fuss
+    if (theViewHiding.viewWillHide) { theViewHiding.viewWillHide(); }
+    if (theViewShowing.viewWillAppear) { theViewShowing.viewWillAppear(); }
+    theViewHiding.style.display = &quot;none&quot;;
+    theViewShowing.style.display = &quot;block&quot;;
+    if (theViewShowing.viewDidAppear) { theViewShowing.viewDidAppear(); }
+    if (theViewHiding.viewDidHide) { theViewHiding.viewDidHide(); }
+
+    PKUI.CORE.viewStack.push(theViewShowing);
+    PKUI.CORE.currentView = theViewShowing;
+    PKUI.CORE.dumpViewStack (&quot;after pushView of &quot; + theView.getAttribute(&quot;id&quot;));
+    PKUTIL.delay(500,function() { $ge(&quot;preventClicks&quot;).style.display = &quot;none&quot;; } );
+
+    return;
+  }
+
+  $ge(&quot;preventClicks&quot;).style.display = &quot;block&quot;; // prevent clicking during animations
+
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... the view hiding: &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+  }
+
+  if (theViewHiding.viewWillHide)
+  {
+    theViewHiding.viewWillHide()
+  }
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Called viewWillHide on hiding View&quot;  + theViewHiding.getAttribute(&quot;id&quot;));
+  }
+
+  if (theView.viewWillAppear)
+  {
+    theView.viewWillAppear();
+  }
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Called viewWillAppear on showing View&quot; + theViewShowing.getAttribute(&quot;id&quot;));
+  }
+
+  theViewHiding.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+  theViewShowing.style.webkitTransform = &quot;translate3d(100%,0,0)&quot;;
+  theViewShowing.style.display = &quot;block&quot;;
+
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Animate in 100ms&quot;);
+  }
+  PKUTIL.delay(100, function()
+  {
+    // this is an animated push
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... Start Animation&quot;);
+    }
+    if (PKUI.CORE.useTransforms)
+    {
+      theViewHiding.style.webkitTransition = &quot;-webkit-transform 0.25s ease-in-out&quot;;
+      theViewShowing.style.webkitTransition = &quot;-webkit-transform 0.25s ease-in-out&quot;;
+      theViewHiding.style.webkitTransform = &quot;translate3d(-100%,0,0)&quot;;
+      theViewShowing.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+
+    } else
+    { 
+      PKUI.CORE.jsaPush(theViewHiding, theViewShowing, 250);
+    }
+
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... Cleanup Animation in 255ms&quot;);
+    }
+    PKUTIL.delay(261, function()
+    {
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Cleaning up Animation&quot;);
+      }
+      
+      theViewHiding.style.webkitTransition = &quot;&quot;;
+      theViewShowing.style.webkitTransition = &quot;&quot;;
+
+      theViewHiding.style.display = &quot;none&quot;;
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Setting display none to &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+      }
+
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Pushed view on stack&quot; + theViewShowing.getAttribute(&quot;id&quot;));
+      }
+      PKUI.CORE.viewStack.push(theViewShowing);
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... And current&quot;);
+      }
+      PKUI.CORE.currentView = theViewShowing;
+
+      if (theViewHiding.viewDidHide)
+      {
+        theViewHiding.viewDidHide();
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Called viewDidHide on hidden View&quot;  + theViewHiding.getAttribute(&quot;id&quot;));
+      }
+      if (theViewShowing.viewDidAppear)
+      {
+        theViewShowing.viewDidAppear();
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Called viewDidAppear on shown View&quot;  + theViewShowing.getAttribute(&quot;id&quot;));
+      }
+
+      $ge(&quot;preventClicks&quot;).style.display = &quot;none&quot;; // prevent clicking during animations
+      PKUI.CORE.dumpViewStack (&quot;after pushView of &quot; + theView.getAttribute(&quot;id&quot;));
+
+    });
+  });
+}
+/**
+ *
+ * Hides a view WITH ANIMATION and pops it from the stack.
+ *
+ */
+PKUI.CORE.popView = function()
+{
+  PKUI.CORE.dumpViewStack (&quot;before popView&quot;);
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;Popping top view...&quot;);
+  }
+
+  if (!(PKUI.CORE.viewStack.length &gt; 1))
+  {
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... There are NO views to pop!!!&quot;);
+    }
+    return;
+    // nothing to pop.
+  }
+
+
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... There are views to pop&quot;);
+  }
+
+  var theViewHiding = PKUI.CORE.viewStack.pop();
+  var theViewShowing = PKUI.CORE.viewStack.pop();
+
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... The view to hide: &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+  }
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... The view to show: &quot; + theViewShowing.getAttribute(&quot;id&quot;));
+  }
+
+  if (PKUI.CORE.viewHandlingMethod !== &quot;fullscreen&quot;)
+  {
+    if (PKUI.CORE.viewHandlingMethod === &quot;column&quot;)
+    {
+      PKUI.CORE.viewStack.push(theViewShowing);     
+      PKUI.CORE.viewStack.push(theViewHiding);
+      PKUI.CORE.popColumnView ( theViewHiding );
+      return;
+    }
+  }
+
+  if (!PKUI.CORE.animate)
+  {
+    $ge(&quot;preventClicks&quot;).style.display = &quot;block&quot;; // prevent clicking during animations
+    // switch views with no fuss
+    if (theViewHiding.viewWillHide) { theViewHiding.viewWillHide(); }
+    if (theViewShowing.viewWillAppear) { theViewShowing.viewWillAppear(); }
+    theViewHiding.style.display = &quot;none&quot;;
+    theViewShowing.style.display = &quot;block&quot;;
+    if (theViewShowing.viewDidAppear) { theViewShowing.viewDidAppear(); }
+    if (theViewHiding.viewDidHide) { theViewHiding.viewDidHide(); }
+
+    PKUI.CORE.currentView = theViewShowing;
+    PKUI.CORE.viewStack.push(theViewShowing);
+    PKUI.CORE.dumpViewStack (&quot;after popView&quot;);
+
+    PKUTIL.delay(500,function() { $ge(&quot;preventClicks&quot;).style.display = &quot;none&quot;; } );
+
+    return;
+  }
+  $ge(&quot;preventClicks&quot;).style.display = &quot;block&quot;; // prevent clicking during animations
+
+  if (theViewHiding.viewWillHide)
+  {
+    theViewHiding.viewWillHide();
+  }
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Called viewWillHide on hiding View &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+  }
+
+  if (theViewShowing.viewWillAppear)
+  {
+    theViewShowing.viewWillAppear();
+  }
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Called viewWillAppear on showing View&quot; + theViewShowing.getAttribute(&quot;id&quot;));
+  }
+
+  theViewHiding.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+  theViewShowing.style.webkitTransform = &quot;translate3d(-100%,0,0)&quot;;
+  theViewShowing.style.display = &quot;block&quot;;
+  if (PKUI.CORE.consoleLogging)
+  {
+    console.log(&quot;... Animating in 100ms&quot;);
+  }
+
+  PKUTIL.delay(100, function()
+  {
+    // this is an animated pop
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... Animating out&quot;);
+    }
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... The view to hide: &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+    }
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... The view to show: &quot; + theViewShowing.getAttribute(&quot;id&quot;));
+    }
+
+    if (PKUI.CORE.useTransforms)
+    {
+      theViewHiding.style.webkitTransition = &quot;-webkit-transform 0.250s ease-in-out&quot;;
+      theViewShowing.style.webkitTransition = &quot;-webkit-transform 0.250s ease-in-out&quot;;
+      theViewHiding.style.webkitTransform = &quot;translate3d(100%,0,0)&quot;;
+      theViewShowing.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+
+    } else
+    {
+      PKUI.CORE.jsaPop(theViewHiding, theViewShowing, 250);
+    }
+
+    if (PKUI.CORE.consoleLogging)
+    {
+      console.log(&quot;... Animation cleanup in 255ms&quot;);
+    }
+
+    PKUTIL.delay(261, function()
+    {
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Cleaning up animation&quot;);
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... The view to hide: &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... The view to show: &quot; + theViewShowing.getAttribute(&quot;id&quot;));
+      }
+
+      theViewHiding.style.webkitTransition = &quot;&quot;;
+      theViewShowing.style.webkitTransition = &quot;&quot;;
+
+      theViewHiding.style.msTransition = &quot;&quot;;
+      theViewShowing.style.msTransition = &quot;&quot;;
+ 
+      theViewHiding.style.display = &quot;none&quot;;
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Set display none to the hiding element&quot; + theViewHiding.getAttribute(&quot;id&quot;));
+      }
+
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Current view is showing view&quot; + theViewShowing.getAttribute(&quot;id&quot;));
+      }
+      PKUI.CORE.currentView = theViewShowing;
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... And pushed to viewStack&quot;);
+      }
+      PKUI.CORE.viewStack.push(theViewShowing);
+
+      if (theViewHiding.viewDidHide)
+      {
+        theViewHiding.viewDidHide();
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Called viewDidHide &quot; + theViewHiding.getAttribute(&quot;id&quot;));
+      }
+      if (theViewShowing.viewDidAppear)
+      {
+        theViewShowing.viewDidAppear();
+      }
+      if (PKUI.CORE.consoleLogging)
+      {
+        console.log(&quot;... Called viewDidAppear &quot; + theViewShowing.getAttribute(&quot;id&quot;));
+      }
+
+      $ge(&quot;preventClicks&quot;).style.display = &quot;none&quot;;
+      PKUI.CORE.dumpViewStack (&quot;after popView&quot;);
+
+    });
+  });
+}
+
+/*
+ * WP7 doesn&#x27;t do touch events, so translate to equivalent mouse events.
+ *
+ *   touchstart = mousedown
+ *   touchmove  = mousemove
+ *   touchend   = mouseup
+ *
+ */
+PKUI.CORE.translateWindowsEvents = function(theEvent)
+{
+  var theTranslatedEvent = theEvent;
+  if (!theTranslatedEvent) { return theTranslatedEvent; }
+  var nonTouchPlatform = ( PKDEVICE.platform() == &quot;wince&quot; || PKDEVICE.platform() == &quot;unknown&quot; );
+  if (nonTouchPlatform &amp;&amp; theTranslatedEvent.toLowerCase().indexOf(&quot;touch&quot;) &gt; -1 )
+  {
+    theTranslatedEvent = theTranslatedEvent.replace(&quot;touch&quot;, &quot;mouse&quot;);
+    theTranslatedEvent = theTranslatedEvent.replace(&quot;start&quot;, &quot;down&quot;);
+    theTranslatedEvent = theTranslatedEvent.replace(&quot;end&quot;, &quot;up&quot;);
+  }
+  return theTranslatedEvent;
+}
+
+/*
+ * Adds a touch listener to theElement, converting touch events for WP7.
+ */
+PKUI.CORE.addTouchListener = function(theElement, theEvent, theFunction)
+{
+  var theTranslatedEvent = PKUI.CORE.translateWindowsEvents(theEvent.toLowerCase());
+  theElement.addEventListener(theTranslatedEvent, theFunction, false);
+}
+
+/*
+ * Removes a touch listener added by addTouchListener
+ */
+PKUI.CORE.removeTouchListener = function(theElement, theEvent, theFunction)
+{
+  var theTranslatedEvent = PKUI.CORE.translateWindowsEvents(theEvent.toLowerCase());
+  theElement.removeEventListener(theTranslatedEvent, theFunction);
+}
+
+/*
+ * Cancels the event in just about every cross-platform way imaginable.
+ */
+PKUI.CORE.cancelEvent = function(theEvent)
+{
+  if (!theEvent)
+  {
+    theEvent = window.event;
+  }
+  if (theEvent.stopPropagation)
+  {
+    theEvent.stopPropagation();
+  }
+  if (theEvent.cancelBubble)
+  {
+    theEvent.cancelBubble();
+  }
+  if (theEvent.preventDefault)
+  {
+    theEvent.preventDefault();
+  } else
+  {
+    theEvent.returnValue = false;
+  }
+}
+
+/**
+ *
+ * Applies touch listeners to various items in the dom.
+ *
+ * In this version of the framework, we apply it to BUTTONs.
+ *
+ */
+PKUI.CORE.applyTouchListeners = function()
+{
+  // things with hover states do funny things, like buttons and anchors.
+  // let&#x27;s deal with them
+  var theNodes = Array();
+  theNodes = theNodes.concat(document.getElementsByTagName(&quot;button&quot;), document.getElementsByTagName(&quot;a&quot;));
+
+  // theNodes is an array like [ NodeList[5], NodeList[1], NodeList[0]... ]
+  for (var n = 0; n &lt; theNodes.length; n++)
+  {
+    var theTags = theNodes[n];
+    for (var i = 0; i &lt; theTags.length; i++)
+    {
+      var theItem = theTags[i];
+      if (!theItem.touchListenersApplied)
+      {
+        PKUI.CORE.addTouchListener(theItem, &quot;touchstart&quot;, function()
+        {
+          this.oldClassName = this.className;
+          this.className += &quot; touched&quot;;
+        });
+        PKUI.CORE.addTouchListener(theItem, &quot;touchend&quot;, function()
+        {
+          if (this.oldClassName !== undefined)
+          {
+            this.className = this.oldClassName;
+          } else
+          {
+            this.className = &quot;&quot;;
+          }
+        });
+        theItem.touchListenersApplied = &quot;YES&quot;;
+      }
+    }
+  }
+}
+
+/*
+ * for platforms that support it,
+ * hide the splash screen when called.
+ */
+PKUI.CORE.hideSplash = function ()
+{
+  cordova.exec(null, null, &quot;SplashScreen&quot;, &quot;hide&quot;, []);
+}
+
+// fire off applyTouchListeners every so often.
+if (PKUI.CORE.listenerInterval !== 0)
+{
+  setInterval(PKUI.CORE.applyTouchListeners, PKUI.CORE.listenerInterval);
+}
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

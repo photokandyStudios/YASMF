@@ -1,0 +1,10 @@
+{
+    "name": "YASMF",
+    "description": "YASMF: Yet Another Simple Mobile Framework",
+    "version": "0.3.100",
+    "url": "https://github.com/photokandyStudios/YASMF",
+    "options": {
+        "outdir": "./docs",
+        "paths": ["./framework"]
+    }
+}

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>demo/platforms/ios/www/framework/ui-msg.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: demo/platforms/ios/www/framework/ui-msg.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/******************************************************************************
+ *
+ * UI-MSG
+ * Author: Kerri Shotts
+ *
+ * This script provides a mechanism by which alerts, prompts, and confirmations
+ * can be displayed to the end user.
+ *
+ ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+
+/*global PKUTIL, device, PKDEVICE, __T */
+PKUTIL.require ( [&quot;PKUTIL&quot;, &quot;PKDEVICE&quot;, &quot;PKUI&quot;, &quot;PKUI.CORE&quot;], function () 
+{ 
+    PKUTIL.export ( &quot;PKUI.MESSAGE&quot; );
+});
+
+
+var PKUI = PKUI ||
+{
+};
+// create the namespace
+
+PKUI.MESSAGE = PKUI.MESSAGE ||
+{
+};
+PKUI.MESSAGE.version = { major: 0, minor: 3, rev: 100 };
+PKUI.MESSAGE.messageStack = [];
+PKUI.MESSAGE.currentMessage = null;
+
+PKUI.MESSAGE.captureBackButton = false;
+
+PKUI.MESSAGE.createBaseElements = function(title, text)
+{
+  var rootElement = document.createElement(&quot;div&quot;);
+  rootElement.className = &quot;pkui-alert-container&quot;;
+
+  var alertElement = document.createElement(&quot;div&quot;);
+  alertElement.className = &quot;pkui-alert&quot;;
+
+  var titleElement = document.createElement(&quot;div&quot;);
+  titleElement.className = &quot;pkui-alert-title&quot;;
+  titleElement.innerHTML = title;
+
+  var msgElement = document.createElement(&quot;div&quot;);
+  msgElement.className = &quot;pkui-alert-message&quot;;
+  msgElement.innerHTML = text;
+
+  var actionElement = document.createElement(&quot;div&quot;);
+  actionElement.className = &quot;pkui-alert-action-container&quot;;
+
+  alertElement.appendChild(titleElement);
+  alertElement.appendChild(msgElement);
+  alertElement.appendChild(actionElement);
+  rootElement.appendChild(alertElement);
+
+  return rootElement;
+}
+
+PKUI.MESSAGE.Confirm = function(title, text, buttons, dismissFn)
+{
+  var self = this;
+  self.title = title;
+  self.text = text;
+  self.dismissFunction = dismissFn;
+
+  self.rootElement = PKUI.MESSAGE.createBaseElements(title, text);
+  self.alertElement = self.rootElement.childNodes[0];
+  self.actionElement = self.alertElement.childNodes[2];
+
+  self.buttonArray = buttons.split(&quot;|&quot;);
+
+  var longButtonList = (self.buttonArray.length &gt; 2);
+
+  for (var i = 0; i &lt; self.buttonArray.length; i++)
+  {
+    var theButtonText = self.buttonArray[i];
+    var secondaryClass = &quot;&quot;;
+    switch (theButtonText[theButtonText.length-1])
+    {
+      case &quot;*&quot;:
+        theButtonText = theButtonText.substr(0, theButtonText.length - 1);
+        secondaryClass = &quot;destructive&quot;;
+        break;
+      case &quot;&gt;&quot;:
+        theButtonText = theButtonText.substr(0, theButtonText.length - 1);
+        secondaryClass = &quot;go&quot;;
+        break;
+      case &quot;&lt;&quot;:
+        theButtonText = theButtonText.substr(0, theButtonText.length - 1);
+        secondaryClass = &quot;cancel&quot;;
+        break;
+      case &quot;_&quot;:
+        theButtonText = theButtonText.substr(0, theButtonText.length - 1);
+        secondaryClass = &quot;wideButton&quot;;
+        break;
+      default:
+        break;
+      // do nothing
+    }
+
+    var theButtonElement = document.createElement(&quot;button&quot;);
+    theButtonElement.className = ( longButtonList ? &quot;wideButton &quot; : &quot;&quot; ) + &quot;barButton&quot; + &quot; &quot; + secondaryClass;
+    theButtonElement.innerHTML = theButtonText;
+    theButtonElement.buttonIndex = i;
+    PKUI.CORE.addTouchListener(theButtonElement, &quot;touchend&quot;, function()
+    {
+      self.dismiss(this.buttonIndex);
+    });
+
+    self.actionElement.appendChild(theButtonElement);
+  }
+
+  self.hide = function()
+  {
+    self.dismiss(-1);
+  }
+  self.backButtonPressed = function()
+  {
+    self.dismiss(-1);
+  }
+  self.show = function()
+  {
+    PKUI.MESSAGE.currentMessage = self;
+    PKUI.MESSAGE.messageStack.push (self);
+    if (PKUI.MESSAGE.captureBackButton)
+    {
+      // capture the backbutton
+      document.addEventListener(&quot;backbutton&quot;, self.backButtonPressed, false);
+    }
+
+    document.body.appendChild(self.rootElement);
+
+    // make us visible; by default we&#x27;ve opacity=0
+    if (PKUI.CORE.useTransforms)
+    {
+      PKUTIL.delay(50, function()
+      {
+        self.rootElement.style.opacity = &quot;1&quot;;
+      });
+      PKUTIL.delay(125, function()
+      {
+        self.alertElement.style.opacity = &quot;1&quot;;
+        self.alertElement.style.webkitTransform = &quot;scale3d(1.05,1.05,1)&quot;
+      });
+      PKUTIL.delay(250, function()
+      {
+        self.alertElement.style.webkitTransform = &quot;scale3d(0.95,0.95,1)&quot;
+      });
+      PKUTIL.delay(375, function()
+      {
+        self.alertElement.style.webkitTransform = &quot;scale3d(1.00,1.00,1)&quot;
+      });
+    } else
+    {
+      self.alertElement.style.webkitTransition = &quot;none&quot;;
+      self.rootElement.style.webkitTransition = &quot;none&quot;;
+      self.alertElement.style.opacity = &quot;1&quot;;
+      self.rootElement.style.opacity = &quot;1&quot;;
+    }
+  }
+
+  self.dismiss = function(idx)
+  {
+      if (window.event) { PKUI.CORE.cancelEvent(); }
+
+    if (PKUI.MESSAGE.captureBackButton)
+    {
+      document.removeEventListener(&quot;backbutton&quot;, self.backButtonPressed);
+    }
+
+    PKUI.MESSAGE.messageStack.pop(); // pop us.
+    if (PKUI.MESSAGE.messageStack.length&gt;0)
+    { // keep the message stack maintained
+      PKUI.MESSAGE.currentMessage = PKUI.MESSAGE.messageStack.pop();
+      PKUI.MESSAGE.messageStack.push( PKUI.MESSAGE.currentMessage );
+    }
+    else
+    {
+      PKUI.MESSAGE.currentMessage = null; // no messages on the stack.
+    }
+    
+
+    if (PKUI.CORE.useTransforms)
+    {
+      self.alertElement.style.opacity = &quot;0&quot;;
+      PKUTIL.delay(250, function()
+      {
+        self.rootElement.style.opacity = &quot;0&quot;;
+      });
+      PKUTIL.delay(500, function()
+      {
+        document.body.removeChild(self.rootElement);
+      });
+    } else
+    {
+      self.alertElement.style.webkitTransition = &quot;none&quot;;
+      self.rootElement.style.webkitTransition = &quot;none&quot;;
+      self.alertElement.style.opacity = &quot;0&quot;;
+      PKUTIL.delay(250, function()
+      {
+        self.rootElement.style.opacity = &quot;0&quot;;
+      });
+      PKUTIL.delay(500, function()
+      {
+        document.body.removeChild(self.rootElement);
+      });
+    }
+    if (self.dismissFunction)
+    {
+      self.dismissFunction(idx);
+    }
+
+  }
+}
+
+PKUI.MESSAGE.Prompt = function(title, text, inputType, defaultValue, buttons, dismissFn)
+{
+  var theAlert = new PKUI.MESSAGE.Confirm(title, text, buttons, dismissFn);
+
+  theAlert.inputElement = document.createElement(&quot;input&quot;);
+  theAlert.inputElement.setAttribute(&quot;type&quot;, inputType || &quot;text&quot;);
+  theAlert.inputElement.value = defaultValue;
+  theAlert.inputElement.className = &quot;pkui-prompt-input&quot;;
+  theAlert.actionElement.previousSibling.appendChild(theAlert.inputElement);
+  theAlert.alertElement.className = &quot;pkui-alert pkui-prompt&quot;;
+
+  return theAlert;
+}
+
+PKUI.MESSAGE.Alert = function(title, text, dismissFn)
+{
+  return new PKUI.MESSAGE.Confirm(title, text, __T(&quot;OK&quot;) + &quot;_&quot;, dismissFn);
+}
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

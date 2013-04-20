@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>framework/ui-gestures.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: framework/ui-gestures.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/******************************************************************************
+ *
+ * UI-GESTURES
+ * Author:  Kerri Shotts
+ * Version: 0.1 alpha
+ * License: MIT
+ *
+ * A simple, no-frills gesture recognizer. Permits long-press recognition,
+ * horizontal swipe recognition, and vertical swipe recognition. Recognizing
+ * swipes in a particular direction (left, right, up, down) should be easy to
+ * add later.
+ *
+ * The SimpleGesture class represents the basic recognizer -- it implements all
+ * the tracking of touch and mouse events. Every 100ms it calls
+ * a recognition function, which by default does nothing. Essentially, Simple-
+ * Gesture is abstract. This method is expected to be overridden by a specific
+ * recognizer, which the LongPressGesture, HorizontalSwipeGesture, and
+ * VerticalSwipeGesture do.
+ *
+ * The LongPressGesture will fire off an event when a longpress is recognized.
+ * How this is recognized is partially defined by the caller -- that is,
+ * two durations can be supplied. By default, the long-press is recognized at
+ * 1s and cancelled at 3s (assuming no previous recognition). It is also
+ * cancelled should any movement outside of a 25px radius occur.
+ *
+ * The HorizontalSwipeGesture and VerticalSwipeGesture will fire off an event
+ * when a swipe in the given axis is detected. This swipe is detected when the
+ * length of the swipe exceeds 75px (or the provided override), and will be
+ * fired as long as the duration of the swipe is less than the cancel duration
+ * (3s by default). The line must not deviate by more than 25px in the specified
+ * axis, or the gesture will fail to be recognized.
+ *
+ * Usage:
+ *
+ * var anElement = document.getElementById(&quot;abc&quot;);
+ * var aLongPressGesture = new GESTURES.LongPressGesture
+ *                             ( anElement, theFunctionToCallWhenRecognized,
+ *                               [ thePressDuration, [ theCancelDelay ]] );
+ *
+ * var aHorizontalSwipeGesture = new GESTURES.HorizontalSwipeGesture
+ *                               ( anElement, theFunctionToCallWhenRecognized,
+ *                                 [ theSwipeLength, [ theCancelDelay ]] );
+ *
+ * var aVerticalSwipeGesture = new GESTURES.VerticalSwipeGesture
+ *                             ( anElement, theFunctionToCallWhenRecognized,
+ *                               [ theSwipeLength, [ theCancelDelay ]] );
+ *
+ *
+ * Where: anElement is an HTML DOM element
+ *        theFunctionToCallWhenRecognized is a function that will be called
+ *            when the gesture is recognized. It will be passed the recognizer,
+ *            and as such, one can store &amp; retrieve data in this manner:
+ *
+ *                 aLongPressGesture.data = &quot;Hello&quot;;
+ *                 function theFunctionToCallWhenRecognized ( gr )
+ *                 { alert (gr.data); }
+ *
+ *            This will generate an alert of &quot;Hello&quot; when the element is long-
+ *            pressed.
+ *
+ *        thePressDuration: Optional, defaults to 1s. The amount of time required
+ *            to recognize a long-press.
+ *        theSwipeLength: Optional, defaults to 75px. The length of a swipe
+ *            required to recognize a swipe.
+ *        theCancelDelay: Optional, defaults to 3s. If a gesture is not recognized
+ *            prior to this delay, the gesture is cancelled, that is, it will
+ *            never be recognized.
+ *
+ ******************************************************************************/
+
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+ 
+var GESTURES = GESTURES ||
+{
+};
+// create the namespace
+GESTURES.consoleLogging = false;
+
+GESTURES.SimpleGesture = function(element)
+{
+  var self = this;
+
+  self.theElement =
+  {
+  };
+
+  self._touchStartX = 0;
+  self._touchStartY = 0;
+  self._touchX = 0;
+  self._touchY = 0;
+  self._deltaX = 0;
+  self._deltaY = 0;
+  self._duration = 0;
+  self._timerId = -1;
+  self._distance = 0;
+  self._event =
+  {
+  };
+  self._cleared = false;
+
+  self.attachToElement = function(element)
+  {
+    // get our element
+    self.theElement = element;
+    // attach our listeners
+    self.theElement.addEventListener(&quot;touchstart&quot;, self.touchStart, false);
+    self.theElement.addEventListener(&quot;touchmove&quot;, self.touchMove, false);
+    self.theElement.addEventListener(&quot;touchend&quot;, self.touchEnd, false);
+
+    self.theElement.addEventListener(&quot;mousedown&quot;, self.mouseDown, false);
+    self.theElement.addEventListener(&quot;mousemove&quot;, self.mouseMove, false);
+    self.theElement.addEventListener(&quot;mouseup&quot;, self.mouseUp, false);
+
+  }
+
+  self.recognizeGesture = function(o)
+  {
+    // we do nothing; no gesture to recognize.
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;default recognizer...&quot;);
+    }
+  }
+
+  self.attachGestureRecognizer = function(fn)
+  {
+    self.recognizeGesture = fn;
+  }
+
+  self.updateGesture = function()
+  {
+    self._duration += 100;
+    self._distance = Math.sqrt((self._deltaX * self._deltaX) + (self._deltaY * self._deltaY));
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;gesture: start: (&quot; + self._touchStartX + &quot;,&quot; + self._touchStartY + &quot;) current: (&quot; + self._touchX + &quot;,&quot; + self._touchY + &quot;) delta: (&quot; + self._deltaX + &quot;,&quot; + self._deltaY + &quot;) delay: &quot; + self._duration + &quot;ms, &quot; + self._distance + &quot;px&quot;);
+    }
+    if (!self._cleared)
+    {
+      self.recognizeGesture(self);
+    }
+  }
+
+  self.clearEvent = function()
+  {
+    if (self._cleared)
+    {
+      if (self._event.cancelBubble)
+      {
+        self._event.cancelBubble();
+      }
+      if (self._event.stopPropagation)
+      {
+        self._event.stopPropagation();
+      }
+      if (self._event.preventDefault)
+      {
+        self._event.preventDefault();
+      } else
+      {
+        self._event.returnValue = false;
+      }
+    }
+    if (self._timerId &gt; -1)
+    {
+      clearInterval(self._timerId);
+      self._timerId = -1;
+    }
+    self._cleared = true;
+  }
+
+  self.eventStart = function()
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;eventstart&quot;);
+    }
+    self._duration = 0;
+    self._deltaX = 0;
+    self._deltaY = 0;
+    self._cleared = false;
+    self._touchStartX = self._touchX;
+    self._touchStartY = self._touchY;
+    self._timerId = setInterval(self.updateGesture, 100);
+  }
+
+  self.touchStart = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;touchstart&quot;);
+    }
+    if (event)
+    {
+      self._touchX = event.touches[0].screenX;
+      self._touchY = event.touches[0].screenY;
+      self._event = event;
+    } else
+    {
+      self._touchX = window.event.screenX;
+      self._touchY = window.event.screenY;
+      self._event = window.event;
+    }
+    self.eventStart();
+  }
+
+  self.mouseDown = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;mousedown&quot;);
+    }
+    if (event)
+    {
+      self._touchX = event.screenX;
+      self._touchY = event.screenY;
+      self._event = event;
+    } else
+    {
+      self._touchX = window.event.screenX;
+      self._touchY = window.event.screenY;
+      self._event = window.event;
+    }
+    self.eventStart();
+  }
+
+  self.eventMove = function()
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;eventmove&quot;);
+    }
+    self._deltaX = self._touchX - self._touchStartX;
+    self._deltaY = self._touchY - self._touchStartY;
+
+    var distance = Math.sqrt((self._deltaX * self._deltaX) + (self._deltaY * self._deltaY));
+
+  }
+
+  self.touchMove = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;touchmove&quot;);
+    }
+    if (event)
+    {
+      self._touchX = event.touches[0].screenX;
+      self._touchY = event.touches[0].screenY;
+      self._event = event;
+    } else
+    {
+      self._touchX = window.event.screenX;
+      self._touchY = window.event.screenY;
+      self._event = window.event;
+    }
+    self.eventMove();
+  }
+
+  self.mouseMove = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;mousemove&quot;);
+    }
+    if (event)
+    {
+      self._touchX = event.screenX;
+      self._touchY = event.screenY;
+      self._event = event;
+    } else
+    {
+      self._touchX = window.event.screenX;
+      self._touchY = window.event.screenY;
+      self._event = window.event;
+    }
+    self.eventMove();
+  }
+
+  self.eventEnd = function()
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;eventend&quot;);
+    }
+    self.clearEvent();
+  }
+
+  self.touchEnd = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;touchend&quot;);
+    }
+    self._event = event || window.event;
+    self.eventEnd();
+  }
+
+  self.mouseUp = function(event)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;mouseup&quot;);
+    }
+    self._event = event || window.event;
+    self.eventEnd();
+  }
+  // attach to the element passed in the constructor.
+  self.attachToElement(element);
+}
+
+GESTURES.LongPressGesture = function(element, whatToDo, delayToRecognition, delayToCancel)
+{
+  var myGesture = new GESTURES.SimpleGesture(element);
+  myGesture._delayToRecognition = delayToRecognition || 1000;
+  myGesture._delayToCancel = delayToCancel || 3000;
+  myGesture._whatToDo = whatToDo;
+  myGesture.attachGestureRecognizer(function(o)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;longpress recognizer...&quot;);
+    }
+    // no finger movement
+    if (o._distance &lt; 25)
+    {
+      // must be between our minimum and maximum delay
+      if (o._duration &gt;= o._delayToRecognition &amp;&amp; o._duration &lt;= o._delayToCancel)
+      {
+        // long-press recognized
+        o.clearEvent();
+        o._whatToDo(o);
+      }
+    } else
+    {
+      o.clearEvent();
+      // long-press cancelled.
+    }
+  });
+  return myGesture;
+}
+
+GESTURES.HorizontalSwipeGesture = function(element, whatToDo, radiusToRecognition, delayToCancel)
+{
+  var myGesture = new GESTURES.SimpleGesture(element);
+  myGesture._radiusToRecognition = radiusToRecognition || 50;
+  myGesture._delayToCancel = delayToCancel || 3000;
+  myGesture._whatToDo = whatToDo;
+  myGesture.attachGestureRecognizer(function(o)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;horizontal recognizer...&quot;);
+    }
+    // no finger movement
+    if (o._distance &gt; o._radiusToRecognition)
+    {
+      // must be between our minimum and maximum delay
+      if (o._duration &lt;= o._delayToCancel)
+      {
+        // finger must trace a straight line
+        if (Math.abs(o._deltaY) &lt; 25)
+        {
+          o.clearEvent();
+          o._whatToDo(o);
+        }
+      }
+    }
+  });
+  return myGesture;
+}
+
+GESTURES.VerticalSwipeGesture = function(element, whatToDo, radiusToRecognition, delayToCancel)
+{
+  var myGesture = new GESTURES.SimpleGesture(element);
+  myGesture._radiusToRecognition = radiusToRecognition || 50;
+  myGesture._delayToCancel = delayToCancel || 3000;
+  myGesture._whatToDo = whatToDo;
+  myGesture.attachGestureRecognizer(function(o)
+  {
+    if (GESTURES.consoleLogging)
+    {
+      console.log(&quot;vertical recognizer...&quot;);
+    }
+    // no finger movement
+    if (o._distance &gt; o._radiusToRecognition)
+    {
+      // must be between our minimum and maximum delay
+      if (o._duration &lt;= o._delayToCancel)
+      {
+        // finger must trace a straight line
+        if (Math.abs(o._deltaX) &lt; 25)
+        {
+          o.clearEvent();
+          o._whatToDo(o);
+        }
+      }
+    }
+  });
+  return myGesture;
+}
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

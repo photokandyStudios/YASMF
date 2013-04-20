@@ -1,0 +1,1337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>framework/ui-base.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: framework/ui-base.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/**
+ *
+ * UI-BASE
+ * @author Kerri Shotts
+ * @version 0.3
+ *
+ * @file This provides the basics of the UI model, including poings, rects, and more.
+ *
+ ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         camelcase:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global PKUTIL, PKDEVICE */
+PKUTIL.require ( [&quot;PKUTIL&quot;, &quot;PKDEVICE&quot;], function () 
+{ 
+    PKUTIL.export ( [ &quot;UI&quot;, &quot;UI.COLOR&quot;, &quot;UI.FONT&quot;, &quot;UI.SHADOW&quot; ] );
+});
+
+/**
+ *
+ * @typedef {Object} point
+ * @typedef {Object} size
+ * @typedef {Object} rect
+ * @typedef {Object} color
+ * @typedef {Object} shadow
+ * @typedef {Object} font
+ * @typedef {Object} event
+ * @typedef {Object} image
+ * @typedef {Object} DOMElement
+ * @typedef {Object} DOMEvent
+ */
+
+/**
+ * Provides the base namespace for various user-interface functions,
+ * including colors, points, rectangles, shadows, fonts, etc. 
+ * @namespace UI
+ * @module UI
+ * @requires PKUTIL
+ * @requires PKDEVICE
+ */
+/**
+ * Provides the base namespace for various user-interface functions,
+ * including colors, points, rectangles, shadows, fonts, etc. 
+ * @class UI
+ */
+var UI = UI || {};
+/**
+  * Version of the UI Namespace
+  * @property version
+  * @type Object
+ **/
+UI.version = { major: 0, minor: 3, rev: 100 };
+
+/**
+ *
+ * Creates a point. Points are of the form
+ * &#x60;{ x: x, y: y }&#x60;
+ *
+ * @method makePoint
+ * @static
+ * @param {Number} x - the x-coordinate of the point
+ * @param {Number} y - the y-coordinate of the point
+ * @returns {point} a point containing x and y
+ *
+ */
+UI.makePoint = function ( x, y )
+{
+    return { x: x, y: y };
+};
+/**
+ *
+ * Creates a copy of a point. You should always copy a point prior
+ * to modifying its values, otherwise you risk modifying the
+ * original.
+ *
+ * @method copyPoint
+ * @static
+ * @param {point} point - the point to copy
+ * @returns {point} a new point, ready for modification
+ *
+ */
+UI.copyPoint = function ( point )
+{
+  return UI.makePoint ( point.x, point.y );
+};
+/**
+ *
+ * offsets a point by the values in another point. For example,
+ * if &#x60;pointA&#x60; = &#x60;{ x:100, y:100 }&#x60; and &#x60;pointB&#x60; = &#x60;{ x:-5, y:10 }&#x60;, the
+ * returned point will be &#x60;{ x:95, y:110 }&#x60;.
+ *
+ * @method offsetPoint
+ * @static
+ * @param {point} pointA - the point to be offset
+ * @param {point} pointB - the offset
+ * @returns {point} pointA offset by pointB
+ *
+ */
+UI.offsetPoint = function ( pointA, pointB )
+{
+  return UI.makePoint ( pointA.x + pointB.x, pointA.y + pointB.y );
+};
+
+/**
+ *
+ * Creates a size of the form &#x60;{ w: width, h: height}&#x60;
+ *
+ * @method makeSize
+ * @static
+ * @param {Number} w - Width portion of a size
+ * @param {Number} h - Height portion of a size
+ * @returns {size} a size comprised of the specified width and height.
+ *
+ */
+UI.makeSize = function ( w, h )
+{
+    return { w: w, h: h };
+};
+/**
+ *
+ * Creates a size from a point.
+ *
+ * @method makeSizeFromPoint
+ * @static
+ * @param {point} point - the point to create a size from
+ * @returns {size} a size based on the x,y coordinates within the point.
+ *
+ */
+UI.makeSizeFromPoint = function ( point )
+{
+  return { w: point.x, h: point.y };
+}
+/**
+ *
+ * Extracts the size from the rect.
+ *
+ * @method sizeFromRect
+ * @static
+ * @param {rect} rect - the rectange from which to extract the size
+ * @returns {size} a size based on the size of the rect.
+ *
+ */
+UI.sizeFromRect = function (rect)
+{
+  return { w: rect.size.w, h: rect.size.h };
+}
+/**
+ *
+ * Copies a size object. You should always copy a size before
+ * modifying a size, else you risk modifying the original size.
+ *
+ * @method copySize
+ * @static
+ * @param {size} size - the size to copy
+ * @returns {size} a duplicate of the size, ready for modification
+ *
+ */
+UI.copySize = function ( size )
+{
+  return UI.makeSize ( size.w, size.h );
+};
+/**
+ *
+ * Offsets a size by another size.
+ *
+ * @method offsetSize
+ * @static
+ * @param {size} sizeA - the size to offset
+ * @param {size} sizeB - the offset
+ * @returns {size} sizeA offset by sizeB
+ *
+ */
+UI.offsetSize = function ( sizeA, sizeB )
+{
+  return UI.makeSize ( sizeA.w + sizeB.w, sizeA.h + sizeB.h );
+};
+
+/**
+ *
+ * Creates a rect of the form &#x60;{ origin: point, size: size }&#x60;
+ * which expands to 
+ * &#x60;{ origin: {x: x, y: y}, size: {w: width, h: height} }&#x60;
+ *
+ * @method makeRect
+ * @static
+ * @param {point} origin - the x,y origin of the rect
+ * @param {size} size - the width,height of the rect
+ * @returns {rect} a rectangle originating at origin with the specified size
+ *
+ */
+UI.makeRect = function ( origin, size )
+{
+    return { origin: { x: origin.x, y: origin.y },
+            size: { w: size.w, h: size.h } };
+};
+/**
+ *
+ * Duplicates a rect, returning a rect suitable for modification. You should
+ * always copy a rect prior to modifying the contents, else you risk
+ * modifying the original.
+ *
+ * @method copyRect
+ * @static
+ * @param {rect} rect - the rect to be copied
+ * @returns {rect} a duplicate of the specified rect, suitable for modification
+ *
+ */
+UI.copyRect = function ( rect )
+{
+  return UI.makeRect ( rect.origin, rect.size );
+};
+
+/**
+ *
+ * Offsets a rect&#x27;s origin point by the supplied point.
+ *
+ * @method offsetRectByPoint
+ * @static
+ * @param {rect} rectA - the rect to be offset
+ * @param {point} pointB - the offset
+ * @returns {rect} rectA offset by pointB
+ *
+ */
+UI.offsetRectByPoint = function ( rectA, pointB )
+{
+  return UI.makeRect ( UI.offsetPoint (rectA.origin, pointB), rectA.size );
+};
+
+/**
+ *
+ * Offsets a rect&#x27;s origin by the origin of the second rect,
+ * and offsets the rect&#x27;s size by the size of the second rect.
+ *
+ * &gt; This implies that the second rect does not need to be &quot;real&quot;,
+ * &gt; as in, it can have negative sizes and such.
+ *
+ * @method offsetRectByRect
+ * @static
+ * @param {rect} rectA - the rect to be offset
+ * @param {rect} rectB - the offset
+ * @returns {rect} a duplicate of rectA offset by rectB.
+ *
+ */
+UI.offsetRectByRect = function ( rectA, rectB )
+{
+  return UI.makeRect ( UI.offsetPoint (rectA.origin, rectB.origin), 
+                       UI.offsetSize (rectA.size, rectB.size) );
+};
+
+/**
+ *
+ * Returns true if the two rects supplied intersect. Note that this
+ * will not work if the rectangles are non-canonical.
+ *
+ * @method doRectsIntersect
+ * @static
+ * @param {rect} rectA - the first rect
+ * @param {rect} rectB - the second rect
+ * @returns {boolean} true if the rects intersect
+ *
+ */
+UI.doRectsIntersect = function ( rectA, rectB )
+{
+  //http://codesam.blogspot.com/2011/02/check-if-two-rectangles-intersect.html
+  var r1tlx = rectA.origin.x;
+  var r2brx = rectB.origin.x + rectB.size.w;
+  var r1brx = rectA.origin.x + rectA.size.w;
+  var r2tlx = rectB.origin.x;
+  var r1tly = rectA.origin.y;
+  var r2bry = rectB.origin.y + rectB.size.h;
+  var r1bry = rectA.origin.y + rectA.size.h;
+  var r2tly = rectB.origin.y;
+  // corrected for Y axis
+  if ( r1tlx &gt;= r2brx || r1brx &lt;= r2tlx || r1tly &gt;= r2bry || r1bry &lt;= r2tly) 
+  {
+    return false;
+  }
+  return true;
+};
+
+
+/**
+ *
+ * Returns a zero point of {0,0}
+ *
+ * @method zeroPoint
+ * @static
+ * @returns {point}
+ *
+ */
+UI.zeroPoint = function () { return UI.makePoint ( 0, 0 ); };
+
+/**
+ *
+ * Returns a zero size of {0,0}
+ *
+ * @method zeroSize
+ * @static
+ * @returns {size}
+ *
+ */
+UI.zeroSize = function () { return UI.makeSize ( 0, 0 ); };
+
+/**
+ *
+ * Returns a zero rect of { {0,0}, {0,0} }
+ *
+ * @method zerRect
+ * @static
+ * @returns {rect}
+ *
+ */
+UI.zeroRect = function () { return UI.makeRect ( UI.zeroPoint(), UI.zeroSize() ); };
+
+/**
+ *
+ * returns a **point** representing the size of the screen (or browser).
+ *
+ * @method screenSize
+ * @static
+ * @returns {point}
+ *
+ */
+UI.screenSize = function () { return UI.makeSize ( window.innerWidth, window.innerHeight ); };
+
+/**
+ *
+ * returns a **rect** representing the size of the screen (with a {0,0} origin).
+ *
+ * @method screenBounds
+ * @static
+ * @returns {rect}
+ *
+ */
+UI.screenBounds = function () { return UI.makeRect ( UI.zeroPoint(), UI.screenSize() ); };
+
+/**
+ *
+ * Creates a font.
+ *
+ * @method makeFont
+ * @static
+ * @param {String} theFontFamily - the font family (as you would specify it in CSS)
+ * @param {Number} theFontSize - the pixel size of the desired font
+ * @param {String} [theFontWeight=&quot;normal&quot;] - the weight of the font (as specified by CSS)
+ * @returns {font} A font object.
+ *
+ */
+UI.makeFont = function ( theFontFamily, theFontSize, theFontWeight )
+{
+  return { family: theFontFamily,
+             size: theFontSize,
+           weight: theFontWeight || &quot;normal&quot;
+         };
+}
+/**
+ *
+ * Copies a font, making it suitable for modification.
+ *
+ * @method copyFont
+ * @static
+ * @param {font} theFont - the font to duplicate
+ * @returns {font} a duplication of theFont, suitable for modification
+ *
+ */
+UI.copyFont = function ( theFont )
+{
+  return UI.makeFont ( theFont.family, theFont.size, theFont.weight );
+}
+/**
+ *
+ * Copies a font, specifying a new size in the process.
+ *
+ * @method copyFontWithNewSize
+ * @static
+ * @param {font} theFont - the font to copy
+ * @param {Number} theNewSize - the new size, in pixels, of the font
+ * @returns {font} a duplication of theFont, but with a new size
+ *
+ */
+UI.copyFontWithNewSize = function ( theFont, theNewSize )
+{
+  return UI.makeFont ( theFont.family, theNewSize, theFont.weight );
+}
+/**
+ *
+ * Copies a font, specifying a delta for the new font size.
+ *
+ * @method copyFontWithNewSizeDelta
+ * @static
+ * @param {font} theFont - the font to copy
+ * @param {Number} theNewSizeDelta - the amount by which to modify the size (in pixels)
+ * @returns {font} a duplication of theFont, adjusted by theNewSizeDelta
+ *
+ */
+UI.copyFontWithNewSizeDelta = function ( theFont, theNewSizeDelta )
+{
+  return UI.makeFont ( theFont.family, theFont.size + theNewSizeDelta, theFont.weight );
+}
+/**
+ *
+ * Copies a font, specifying a percentage for the new size. A value of 1.00 will keep
+ * the size the same; while 1.25 would increase the size and 0.75 would decrease the
+ * size.
+ *
+ * @method copyFontWithPercentSize
+ * @static
+ * @param {font} theFont - the font to copy
+ * @param {Number} theNewSizeDelta - the amount by which to multiply the size
+ * @returns {font} a duplicate of theFont, with the size multiplied by theNewSizeDelta
+ *
+ */
+UI.copyFontWithPercentSize = function ( theFont, theSizePercent )
+{
+  return UI.makeFont ( theFont.family, theFont.size * theSizePercent, theFont.weight );
+}
+/**
+ *
+ * Applies a font to an element. If theFont is null, the values used
+ * are the CSS &quot;inherit&quot; properties.
+ * @private
+ *
+ * @method _applyFontToElement
+ * @static
+ * @param {DOMElement} theElement - the DOM element the to which the font is applied
+ * @param {font} theFont - the font to apply
+ *
+ */
+UI._applyFontToElement = function ( theElement, theFont )
+{
+  if (theFont)
+  {
+    theElement.style.fontFamily = theFont.family;
+    theElement.style.fontSize = &quot;&quot; + theFont.size + &quot;px&quot;;
+    theElement.style.fontWeight = theFont.weight;
+  }
+  else
+  {
+    theElement.style.fontFamily = &quot;inherit&quot;;
+    theElement.style.fontSize = &quot;inherit&quot;;
+    theElement.style.fontWeight = &quot;inherit&quot;;
+  }
+}
+
+/**
+ * UI.FONT
+ * @namespace UI
+ * @class FONT
+ */
+UI.FONT = UI.FONT || {};
+
+/**
+ *
+ * Returns a system font, specific to the platform. Use this when attempting to 
+ * match the platform&#x27;s default font.
+ *
+ * @method systemFont
+ * @static
+ * @returns {font}
+ */
+UI.FONT.systemFont = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeFont ( &quot;Helvetica, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    case &quot;android&quot;: return UI.makeFont ( &quot;Roboto, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    case &quot;wince&quot;: return UI.makeFont ( &quot;Segoe, Arial, sans-serif&quot;, 20, &quot;normal&quot; );
+    default: return UI.makeFont ( &quot;sans-serif&quot;, 20, &quot;normal&quot; );
+  }
+}
+/**
+ *
+ * Returns a bolded system font, specific to the platform.
+ *
+ * @method boldSystemFont
+ * @static
+ * @returns {font} a bolded version of {@link UI.FONT.systemFont}
+ */
+UI.FONT.boldSystemFont = function ()
+{
+  var theSystemFont = UI.copyFont( UI.FONT.systemFont() );
+  theSystemFont.weight = &quot;bold&quot;;
+  return theSystemFont;
+}
+
+/**
+ * @class UI
+ */
+/**
+ *
+ * Creates a shadow for use as text or box shadows.
+ *
+ * @method makeShadow
+ * @static
+ * @param {boolean} theVisibility - indicates the visibility of the shadow.
+ * @param {color} theColor - the color of the shadow.
+ * @param {point} theOffset - the shadow offset
+ * @param {Number} theBlur - the amount to blur the shadow (can be zero, but not negative)
+ * @param {Number} theSpread - the amount of spread to use (box shadows only, can be zero, but not negative)
+ * @param {string} [theType] - specify &quot;inset&quot; for inset box shadows, otherwise omit or make null.
+ * @returns {shadow}
+ *
+ */
+UI.makeShadow = function ( theVisibility, theColor, theOffset, theBlur, theSpread, theType )
+{
+  return { visible: theVisibility, color: UI.copyColor(theColor), offset: UI.copyPoint ( theOffset ), 
+           blur: theBlur || 0, spread: theSpread || 0, type: theType || &quot;&quot; };
+}
+/**
+ *
+ * Copies a shadow and makes it suitable for modification. Always copy a shadow prior to modification,
+ * otherwise you risk modifying the original.
+ *
+ * @method copyShadow
+ * @static
+ * @param {shadow} theShadow - the shadow to be copied
+ * @returns {shadow} the duplicated shadow, suitable for modificaiton
+ *
+ */
+UI.copyShadow = function ( theShadow )
+{
+  return UI.makeShadow ( theShadow.visible, theShadow.color, theShadow.offset, theShadow.blur, theShadow.spread, theShadow.type );
+}
+/**
+ *
+ * applies a shadow to an element&#x27;s text. If the shadow is null or invisible, the &quot;inherit&quot;
+ * CSS is applied. If the shadow&#x27;s color is null, the shadow will be transparent.
+ *
+ * **Note:** the shadow&#x27;s spread, if not 0 is ignored, since text shadows don&#x27;t support spread.
+ *
+ * @private
+ * @method _applyShadowToElementAsTextShadow
+ * @static
+ * @param {DOMElement} theElement - the DOM element to which to apply the shadow
+ * @param {shadow} theShadow - the shadow to apply
+ *
+ */
+UI._applyShadowToElementAsTextShadow = function ( theElement, theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      theElement.style.textShadow = &quot;&quot; + theShadow.offset.x + &quot;px &quot; +
+                                         theShadow.offset.y + &quot;px &quot; +
+                                         theShadow.blur + &quot;px &quot; +
+                                         UI._colorToRGBA(theShadow.color) + &quot;&quot;;
+    }
+    else
+    {
+      theElement.style.textShadow = &quot;inherit&quot;;
+    }
+  }
+  else
+  {
+    theElement.style.textShadow = &quot;inherit&quot;;
+  }    
+}
+/**
+ *
+ * applies a shadow to an element. If the shadow is null or invisible, the &quot;inherit&quot;
+ * CSS is applied. If the shadow&#x27;s color is null, the shadow will be transparent.
+ * @private
+ * @method _shadowToBoxShadow
+ * @static
+ * @param {DOMElement} theElement - the DOM element to which to apply the shadow
+ * @param {shadow} theShadow - the shadow to apply
+ *
+ */
+UI._shadowToBoxShadow = function (  theShadow )
+{
+  if (theShadow)
+  {
+    if (theShadow.visible)
+    {
+      return  &quot;&quot; +  theShadow.type + &quot; &quot; + theShadow.offset.x + &quot;px &quot; +
+                                         theShadow.offset.y + &quot;px &quot; +
+                                         theShadow.blur + &quot;px &quot; +
+                                         theShadow.spread + &quot;px &quot; + 
+                                         UI._colorToRGBA(theShadow.color) + &quot;&quot;;
+    }
+    else
+    {
+      return  &quot;inherit&quot;;
+    }
+  }
+  else
+  {
+    return  &quot;inherit&quot;;
+  }    
+}
+
+/**
+ * UI.SHADOW
+ * @namespace UI
+ * @class SHADOW
+ */
+UI.SHADOW = UI.SHADOW || {};
+
+/**
+ *
+ * Returns a default dark shadow, depending on the platform. Some platforms return an
+ * invisible shadow, since they tend not to use text shadows.
+ *
+ * @method defaultDarkShadow
+ * @static
+ * @returns {shadow}
+ */
+UI.SHADOW.defaultDarkShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeShadow ( true, &quot;rgba(0,0,0,0.25)&quot;, UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, &quot;#000&quot;, UI.zeroPoint(), 0 );
+  }
+}
+/**
+ *
+ * Returns a default light shadow, depending on the platform. Some platforms return an
+ * invisible shadow, since they tend not to use text shadows.
+ *
+ * @method lightDarkShadow
+ * @static
+ * @returns {shadow}
+ */
+UI.SHADOW.defaultLightShadow = function ()
+{
+  var theCurrentPlatform = PKDEVICE.platform();
+  switch (theCurrentPlatform)
+  {
+    case &quot;ios&quot;: return UI.makeShadow ( true, &quot;rgba(255,255,255,0.75)&quot;, UI.makePoint( 0, -1), 0 );
+    default: return UI.makeShadow ( false, &quot;#FFF&quot;, UI.zeroPoint(), 0 );
+  }
+}
+
+/**
+ * @class UI
+ */
+/**
+ *
+ * Converts a color object to an rgba(r,g,b,a) string, suitable for applying to
+ * any number of CSS styles. If the color&#x27;s alpha is zero, the return value is
+ * &quot;transparent&quot;. If the color is null, the return value is &quot;inherit&quot;.
+ *
+ * @private
+ * @method _colorToRGBA
+ * @static
+ * @param {color} theColor - theColor to convert.
+ * @returns {string} a CSS value suitable for color properties
+ */
+UI._colorToRGBA = function ( theColor )
+{
+  if (!theColor)
+  {
+    return &quot;inherit&quot;;
+  }
+  if (theColor.alpha !== 0)
+  {
+    return &quot;rgba(&quot; + theColor.red + &quot;,&quot; + theColor.green + &quot;,&quot; + theColor.blue + &quot;,&quot; + theColor.alpha + &quot;)&quot;;
+  }
+  else
+  {
+    return &quot;transparent&quot;;
+  }
+}
+/**
+ *
+ * Creates a color object of the form &#x60;{red:r, green:g, blue:b, alpha:a}&#x60;.
+ *
+ * @method makeColor
+ * @static
+ * @param {Number} r - red component (0-255)
+ * @param {Number} g - green component (0-255)
+ * @param {Number} b - blue component (0-255)
+ * @param {Number} a - alpha component (0.0-1.0)
+ * @returns {color}
+ *
+ */
+UI.makeColor = function ( r, g, b, a )
+{
+  return { red: r, green: g, blue: b, alpha: a };
+}
+/**
+ *
+ * Copies a color and returns it suitable for modification. You should copy
+ * colors prior to modification, otherwise you risk modifying the original.
+ *
+ * @method copyColor
+ * @static
+ * @param {color} theColor - the color to be duplicated
+ * @returns {color} a duplicate color ready to be modified
+ *
+ */
+UI.copyColor = function (theColor)
+{
+  return UI.makeColor ( theColor.red, theColor.green, theColor.blue, theColor.alpha );
+}
+
+/**
+ * UI.COLOR
+ * @namespace UI
+ * @class COLOR
+ */
+UI.COLOR = UI.COLOR || {};
+/** @static 
+ * @method blackColor 
+ * @returns {color} a black color. 
+ */
+UI.COLOR.blackColor     = function () { return UI.makeColor (   0,   0,   0, 1.0 ); }
+/** @static 
+ * @method darkGrayColor 
+ * @returns {color} a dark gray color. 
+ */
+UI.COLOR.darkGrayColor  = function () { return UI.makeColor (  85,  85,  85, 1.0 ); }
+/** @static 
+ * @method GrayColor 
+ * @returns {color} a gray color. 
+ */
+UI.COLOR.GrayColor      = function () { return UI.makeColor ( 127, 127, 127, 1.0 ); }
+/** @static 
+ * @method lightGrayColor 
+ * @returns {color} a light gray color. 
+ */
+UI.COLOR.lightGrayColor = function () { return UI.makeColor ( 170, 170, 170, 1.0 ); }
+/** @static 
+ * @method whiteColor 
+ * @returns {color} a white color. 
+ */
+UI.COLOR.whiteColor     = function () { return UI.makeColor ( 255, 255, 255, 1.0 ); }
+/** @static 
+ * @method blueColor 
+ * @returns {color} a blue color. 
+ */
+UI.COLOR.blueColor      = function () { return UI.makeColor (   0,   0, 255, 1.0 ); }
+/** @static 
+ * @method greenColor 
+ * @returns {color} a green color. 
+ */
+UI.COLOR.greenColor     = function () { return UI.makeColor (   0, 255,   0, 1.0 ); }
+/** @static 
+ * @method redColor 
+ * @returns {color} a red color. 
+ */
+UI.COLOR.redColor       = function () { return UI.makeColor ( 255,   0,   0, 1.0 ); }
+/** @static 
+ * @method cyanColor 
+ * @returns {color} a cyan color. 
+ */
+UI.COLOR.cyanColor      = function () { return UI.makeColor (   0, 255, 255, 1.0 ); }
+/** @static 
+ * @method yellowColor 
+ * @returns {color} a yellow color. 
+ */
+UI.COLOR.yellowColor    = function () { return UI.makeColor ( 255, 255,   0, 1.0 ); }
+/** @static 
+ * @method magentaColor 
+ * @returns {color} a magenta color. 
+ */
+UI.COLOR.magentaColor   = function () { return UI.makeColor ( 255,   0, 255, 1.0 ); }
+/** @static 
+ * @method orangeColor 
+ * @returns {color} a orange color. 
+ */
+UI.COLOR.orangeColor    = function () { return UI.makeColor ( 255, 127,   0, 1.0 ); }
+/** @static 
+ * @method purpleColor 
+ * @returns {color} a purple color. 
+ */
+UI.COLOR.purpleColor    = function () { return UI.makeColor ( 127,   0, 127, 1.0 ); }
+/** @static 
+ * @method brownColor 
+ * @returns {color} a brown color. 
+ */
+UI.COLOR.brownColor     = function () { return UI.makeColor ( 153, 102,  51, 1.0 ); }
+/** @static 
+ * @method lightTextColor 
+ * @returns {color} a light text color suitable for display on dark backgrounds. 
+ */
+UI.COLOR.lightTextColor = function () { return UI.makeColor ( 240, 240, 240, 1.0 ); }
+/** @static 
+ * @method darkTextColor 
+ * @returns {color} a dark text color suitable for display on light backgrounds. 
+ */
+UI.COLOR.darkTextColor  = function () { return UI.makeColor (  15,  15,  15, 1.0 ); }
+/** @static 
+ * @method clearColor 
+ * @returns {color} a transparent color. 
+ */
+UI.COLOR.clearColor     = function () { return UI.makeColor (   0,   0,   0, 0.0 ); }
+
+/**
+ * @class UI
+ */
+/**
+ *
+ * Makes an image object. The options object can contain any of the following
+ * properties: repeat (default &quot;no-repeat&quot;), position (&quot;top left&quot;), sizing
+ * (&quot;&quot;), and imageType (&quot;url&quot;). Repeat can be &quot;repeat-x&quot;,&quot;repeat-y&quot;,&quot;reepat&quot; or
+ * &quot;no-repeat&quot;. Position is a CSS position. Sizing can be empty, &quot;contain&quot; or
+ * &quot;cover&quot;. imageType specifies if the image is a &quot;url&quot; asset or something
+ * else (like a &quot;gradient&quot;).
+ *
+ * @method makeImage
+ * @static
+ * @param {string} thePathToTheImage - the relative or absolute path to the image
+ * @param {size} theImageSize - the size of the image as it should appear logically;
+ *                              if an image should be displayed with retina quality,
+ *                              the physical pixels would be 64x64 whereas the size
+ *                              would be {32,32}.
+ * @param {Object} options - options for the image. These are all optional, but useful.
+ * @returns {image}
+ */
+UI.makeImage = function ( thePathToTheImage, theImageSize, options )
+{
+  var theRatio = window.devicePixelRatio;
+  var theNewImageSize = null
+  if (theImageSize)
+  {
+    theNewImageSize = UI.copySize( theImageSize );
+  }
+  var aNewImage = { image: thePathToTheImage, 
+                    imageSize : theNewImageSize,
+                    targetSize: null,
+                    repeat: options.repeat || &quot;no-repeat&quot;,
+                    position: options.position || &quot;top left&quot;,
+                    sizing: options.sizing || &quot;&quot;,
+                    imageType: options.imageType || &quot;url&quot; }; // url, gradient, etc.
+  //UI.recalcImageSize ( aNewImage );
+  return aNewImage;
+}
+/*UI.recalcImageSize = function ( theImage )
+{
+  var theRatio = window.devicePixelRatio || 1;
+  if (theImage.imageSize)
+  {
+    var theTargetSize = UI.makeSize ( theImage.imageSize.w / theRatio,
+                                      theImage.imageSize.h / theRatio );
+    theImage.targetSize = theTargetSize;
+  }
+}*/
+/**
+ *
+ * Copies an image and returns it suitable for modification. You should always
+ * duplicate an image prior to modification or you risk modifying the original.
+ *
+ * @method copyImage
+ * @static
+ * @param {image} theImage - the image to be copied
+ * @returns {image} a duplicate image, suitable for modification
+ */
+UI.copyImage = function ( theImage )
+{
+  return UI.makeImage ( theImage.image, theImage.imageSize,
+                        { repeat: theImage.repeat, position: theImage.position, sizing: theImage.sizing,
+                          imageType: theImage.imageType } );
+}
+/**
+ *
+ * Applies an image to the background of a DOMElement. If the image type
+ * as &quot;url&quot;, the image is assumed to be a graphic asset, but if it is
+ * some other value, the backgroundImage property is assigned the
+ * image property directly (say, as a gradient).
+ *
+ * If sizing is specified, it is used over any specific size. If a size
+ * is specified, but no sizing, it is used (and should be understood as
+ * logical pixels). Any one component of a size that is -1 will be
+ * converted to &quot;auto&quot;.
+ * @private
+ *
+ * @method _applyImageToElemnt
+ * @static
+ * @param {DOMElement} theElement - the DOM Element to apply the image to
+ * @param {image} theImage - the image to appy
+ *
+ */
+UI._applyImageToElement = function ( theElement, theImage )
+{
+  if (!theImage)
+  {
+    theElement.style.backgroundImage = &quot;&quot;;
+    theElement.style.backgroundPosition = &quot;&quot;;
+    theElement.style.backgroundSize = &quot;&quot;;
+    theElement.style.backgroundRepeat = &quot;&quot;;
+    return;
+  }
+  if (theImage.imageType == &quot;url&quot;)
+  {
+      theElement.style.backgroundImage = &quot;url(&quot; + theImage.image + &quot;)&quot;;
+  }
+  else
+  {
+    theElement.style.backgroundImage = theImage.image;
+  }
+  if (theImage.sizing !== &quot;&quot;)
+  {
+    theElement.stle.backgroundSize = theImage.sizing; // cover, contain
+  }
+  else
+  {
+    if (theImage.imageSize)
+    {
+      theElement.style.backgroundSize = &quot;&quot; + 
+       ((theImage.imageSize.w&gt;-1) ? theImage.imageSize.w + &quot;px &quot; : &quot;auto &quot;) + 
+       ((theImage.imageSize.h&gt;-1) ? theImage.imageSize.h + &quot;px&quot; : &quot;auto&quot; );
+    }
+    else
+    {
+      theElement.style.backgroundSize = &quot;&quot;;
+    }
+  }
+  theElement.style.backgroundPosition = theImage.position;
+  theElement.style.backgroundRepeat = theImage.repeat;
+}
+/**
+ *
+ * Creates a linear gradient image that can be used wherever images are used.
+ *
+ * @method makeLinearGradientImage
+ * @static
+ * @param {String} gradientOrigin - the CSS origin of the gradient (like top, left, etc.)
+ * @param {Array} colorStops - a series of color stops, each one of the form {color: color, position: position} where
+ *                             position is optional. The position is a CSS position (like 0%,50%,100%).
+ * @returns {image} an image with the specified gradient.
+ *
+ */
+UI.makeLinearGradientImage = function ( gradientOrigin, colorStops )
+{
+  var gradientString = &quot;-webkit-linear-gradient(&quot; + gradientOrigin + &quot;, &quot;;
+  for (var i=0; i&lt;colorStops.length; i++)
+  {
+    gradientString += UI._colorToRGBA(colorStops[i].color) + &quot; &quot; + (colorStops[i].position || &quot;&quot;);
+    if (i&lt;colorStops.length-1)
+    {
+      gradientString += &quot;, &quot;
+    }
+  }
+  gradientString += &quot;)&quot;;
+  return UI.makeImage ( gradientString, null, { imageType: &quot;gradient&quot; } );
+}
+/**
+ *
+ * Creates a simple linear gradient that can be used wherever images are used. Unlike
+ * {@link UI.makeLinearGradientImage}, only two color stops and positions are used.
+ *
+ * @method makeSimpleLinearGradientImage
+ * @static
+ * @param {String} gradientOrigin - the CSS origin of the gradient (like top, left, etc.)
+ * @param {color} color1 - the color for the first stop
+ * @param {String} color1Position - the position for the first stop (or null if the default is acceptable)
+ * @param {color} color2 - the color for the second stop
+ * @param {String} color2Position - the position for the second stop (or null)
+ *
+ */
+UI.makeSimpleLinearGradientImage = function ( gradientOrigin, color1, color1Position, color2, color2Position )
+{
+  return UI.makeLinearGradientImage ( gradientOrigin, [ {color: color1, position: color1Position},
+                                                        {color: color2, position: color2Position} ] );
+}
+/**
+ *
+ * Creates a border for a (generic) side.
+ *
+ * @method makeBorderForSide
+ * @static
+ * @param {color} theBorderColor - the color for the borde
+ * @param {String} [theBorderStyle=&quot;inherit&quot;] - a CSS border style
+ * @param {Number} [theBorderStrokeWidth=&quot;inherit&quot;] - the number of pixels for the border stroke
+ *
+ * returns {Object} a Border Side
+ */
+UI.makeBorderForSide = function ( theBorderColor, theBorderStyle, theBorderStrokeWidth )
+{
+  var theNewColor = null;
+  if (theBorderColor) { theNewColor = UI.copyColor(theBorderColor); }
+
+  return { color: theNewColor, style: theBorderStyle || &quot;inherit&quot;, width: theBorderStrokeWidth || &quot;inherit&quot;};
+}
+/**
+ *
+ * Copies a border for a side; always copy before modification, or you risk
+ * modifying the original.
+ *
+ * @method copyBorderForSide
+ * @static
+ * @param {Object} theBorderForSide - the border side to copy
+ * @returns {Object} a copied Border side
+ */
+UI.copyBorderForSide = function ( theBorderForSide )
+{
+  return UI.makeBorderForSide (theBorderForSide.color, theBorderForSide.style, theBorderForSide.width );
+}
+/**
+ *
+ * Creates a border for applicatiom to DOM Elements.
+ *
+ * The borders are specified with the top-level color, style, and width parameters (all optional)
+ * can be applied to all sides, but a specific property (in the top, left, right, bottom) borders
+ * will override any top-level property. Any property not specified will be given a suitable
+ * default.
+ *
+ * The borderRadii object specifies the specific border radii (topLeftBorderRadius, topRightBorderRadius,
+ * bottomLeftBorderRadius, bottomRightBorderRadius), but if any are missing, borderRadius will be used
+ * instead. If that property is not defined, &quot;inherit&quot; is used.
+ *
+ * @method makeBorder
+ * @static
+ * @param {Object} borders - an object that specifies the borders, for all sides, and for each side
+ * @param {Object} borderRadii - an object that specifies the border radii
+ * @returns {border} a border
+ *
+ */
+UI.makeBorder = function ( borders, borderRadii )
+{
+  var theBorder = { color: null, style: &quot;inherit&quot;, width: 0 };
+  if (borders)
+  {
+    if (borders.color) { theBorder.color = UI.copyColor(borders.color); }
+    if (borders.style) { theBorder.style = borders.style  }
+    if (borders.width) { theBorder.width = borders.width  }
+    if (borders.top) { theBorder.top = UI.copyBorderForSide(borders.top); }
+    if (borders.left) { theBorder.left = UI.copyBorderForSide(borders.left); }
+    if (borders.right) { theBorder.right = UI.copyBorderForSide(borders.right); }
+    if (borders.bottom) { theBorder.bottom = UI.copyBorderForSide(borders.bottom); }
+  }
+  if (borderRadii)
+  {
+    theBorder.topLeftBorderRadius = borderRadii.topLeftBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.topRightBorderRadius = borderRadii.topRightBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.bottomLeftBorderRadius = borderRadii.bottomLeftBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+    theBorder.bottomRightBorderRadius = borderRadii.bottomRightBorderRadius || borderRadii.borderRadius || &quot;inherit&quot;;
+  }
+  else
+  {
+    theBorder.topLeftBorderRadius = &quot;inherit&quot;;
+    theBorder.topRightBorderRadius = &quot;inherit&quot;;
+    theBorder.bottomLeftBorderRadius = &quot;inherit&quot;;
+    theBorder.bottomRightBorderRadius = &quot;inherit&quot;;
+  }
+  return theBorder;
+}
+/**
+ *
+ * Copies a border for modification. Always copy borders prior to modifying them, else you
+ * risk modifying the original.
+ *
+ * @method copyBorder
+ * @static
+ * @param {border} borders - the border to duplicate
+ * @returns {border}
+ */
+UI.copyBorder = function ( borders )
+{
+  return UI.makeBorder ( borders, { topLeftBorderRadius: borders.topLeftBorderRadius, 
+                                    topRightBorderRadius: borders.topRightBorderRadius,
+                                    bottomLeftBorderRadius: borders.bottomLeftBorderRadius, 
+                                    bottomRightBorderRadius: borders.bottomRightBorderRadius } );
+}
+/**
+ *
+ * Applies a border to an element.
+ * @private
+ *
+ * @method _applyBorderToElement
+ * @static
+ * @param {DOMElement} theElement - the DOM element to which to apply the border
+ * @param {borde} theBorder - the border to apply
+ *
+ */
+UI._applyBorderToElement = function ( theElement, theBorder )
+{
+  // over-arching
+  if ( theBorder.color ) { theElement.style.borderColor = UI._colorToRGBA(theBorder.color); }
+                    else { theElement.style.borderColor = &quot;&quot; }
+  if ( theBorder.style !== &quot;inherit&quot; ) { theElement.style.borderStyle = theBorder.style; }
+                                  else { theElement.style.borderStyle = &quot;&quot;; }
+  if ( theBorder.width !== &quot;inherit&quot; ) { theElement.style.borderWidth = &quot;&quot; + theBorder.width + &quot;px&quot;; }
+                                  else { theElement.style.borderWidth = &quot;&quot;; }
+  // and now, the specifics
+  if ( theBorder.left )
+  {
+    if (theBorder.left.color) { theElement.style.borderLeftColor = UI._colorToRGBA(theBorder.left.color); }
+    if ( theBorder.left.style !== &quot;inherit&quot; ) { theElement.style.borderLeftStyle = theBorder.left.style; }
+    if ( theBorder.left.width !== &quot;inherit&quot; ) { theElement.style.borderLeftWidth = &quot;&quot; + theBorder.left.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.top )
+  {
+    if (theBorder.top.color) { theElement.style.borderTopColor = UI._colorToRGBA(theBorder.top.color); }
+    if ( theBorder.top.style !== &quot;inherit&quot; ) { theElement.style.borderTopStyle = theBorder.top.style; }
+    if ( theBorder.top.width !== &quot;inherit&quot; ) { theElement.style.borderTopWidth = &quot;&quot; + theBorder.top.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.right )
+  {
+    if (theBorder.right.color) { theElement.style.borderRightColor = UI._colorToRGBA(theBorder.right.color); }
+    if ( theBorder.right.style !== &quot;inherit&quot; ) { theElement.style.borderRightStyle = theBorder.right.style; }
+    if ( theBorder.right.width !== &quot;inherit&quot; ) { theElement.style.borderRightWidth = &quot;&quot; + theBorder.right.width + &quot;px&quot;; }
+  }
+
+  if ( theBorder.bottom )
+  {
+    if (theBorder.bottom.color) { theElement.style.borderBottomColor = UI._colorToRGBA(theBorder.bottom.color); }
+    if ( theBorder.bottom.style !== &quot;inherit&quot; ) { theElement.style.borderBottomStyle = theBorder.bottom.style; }
+    if ( theBorder.bottom.width !== &quot;inherit&quot; ) { theElement.style.borderBottomWidth = &quot;&quot; + theBorder.bottom.width + &quot;px&quot;; }
+  }
+
+  // border radii
+  theElement.style.borderTopLeftRadius = theBorder.topLeftBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.topLeftBorderRadius + &quot;px&quot;;
+  theElement.style.borderTopRightRadius = theBorder.topRightBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.topRightBorderRadius + &quot;px&quot;;
+  theElement.style.borderBottomLeftRadius = theBorder.bottomLeftBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.bottomLeftBorderRadius + &quot;px&quot;;
+  theElement.style.borderBottomRightRadius = theBorder.bottomRightBorderRadius == &quot;inherit&quot; ? &quot;&quot; : theBorder.bottomRightBorderRadius + &quot;px&quot;;
+}
+/**
+ *
+ * Creates an event object from a DOM event.
+ *
+ * The event returned contains all the touches from the DOM event in an array of {x,y} objects.
+ * The event also contains the first touch as x,y properties and the average of all touches
+ * as avgX,avgY. If no touches are in the event, these values will be -1.
+ *
+ * @method makeEvent
+ * @static
+ * @param {DOMEvent} e - the DOM event
+ * @returns {event}
+ *
+ */
+UI.makeEvent = function ( e )
+{
+  var newEvent = { _originalEvent: e, touches: [], x: -1, y: -1, avgX: -1, avgY: -1 };
+  if (e.touches)
+  {
+    var avgXTotal = 0;
+    var avgYTotal = 0;
+    for (var i=0; i&lt;e.touches.length; i++)
+    {
+      newEvent.touches.push ( { x: e.touches[i].clientX, y: e.touches[i].clientY } );
+      avgXTotal += e.touches[i].clientX;
+      avgYTotal += e.touches[i].clientY;
+      if (i===0)
+      {
+        newEvent.x = e.touches[i].clientX;
+        newEvent.y = e.touches[i].clientY;
+      }
+    }
+    if (e.touches.length&gt;0)
+    {
+      newEvent.avgX = avgXTotal / e.touches.length;
+      newEvent.avgY = avgYTotal / e.touches.length;
+    }
+  }
+  else
+  {
+    if (event.pageX)
+    {
+      newEvent.touches.push ( { x: e.pageX, y: e.pageY } );
+      newEvent.x = e.pageX;
+      newEvent.y = e.pageY;
+      newEvent.avgX = e.pageX;
+      newEvent.avgY = e.pageY;
+    }
+  }
+  return newEvent;
+}
+
+/**
+ *
+ * Cancels an event that&#x27;s been created using {@link UI.makeEvent}.
+ *
+ * @method cancelEvent
+ * @static
+ * @param {event} e - the event to cancel
+ *
+ */
+UI.cancelEvent = function ( e )
+{
+  if (e._originalEvent.cancelBubble)
+  {
+    e._originalEvent.cancelBubble();
+  }
+  if (e._originalEvent.stopPropagation)
+  {
+    e._originalEvent.stopPropagation();
+  }
+  if (e._originalEvent.preventDefault)
+  {
+    e._originalEvent.preventDefault();
+  } else
+  {
+    e._originalEvent.returnValue = false;
+  }
+}
+
+
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>

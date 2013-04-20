@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>demo/platforms/ios/build/YASMFDemoApp.app/www/framework/ui-view.js - YASMF</title>
+    <link rel="stylesheet" href="http://yui.yahooapis.com/3.9.1/build/cssgrids/cssgrids-min.css">
+    <link rel="stylesheet" href="../assets/vendor/prettify/prettify-min.css">
+    <link rel="stylesheet" href="../assets/css/main.css" id="site_styles">
+    <link rel="shortcut icon" type="image/png" href="../assets/favicon.png">
+    <script src="http://yui.yahooapis.com/combo?3.9.1/build/yui/yui-min.js"></script>
+</head>
+<body class="yui3-skin-sam">
+
+<div id="doc">
+    <div id="hd" class="yui3-g header">
+        <div class="yui3-u-3-4">
+            
+                <h1><img src="../assets/css/logo.png" title="YASMF"></h1>
+            
+        </div>
+        <div class="yui3-u-1-4 version">
+            <em>API Docs for: 0.3.100</em>
+        </div>
+    </div>
+    <div id="bd" class="yui3-g">
+
+        <div class="yui3-u-1-4">
+            <div id="docs-sidebar" class="sidebar apidocs">
+                <div id="api-list">
+    <h2 class="off-left">APIs</h2>
+    <div id="api-tabview" class="tabview">
+        <ul class="tabs">
+            <li><a href="#api-classes">Classes</a></li>
+            <li><a href="#api-modules">Modules</a></li>
+        </ul>
+
+        <div id="api-tabview-filter">
+            <input type="search" id="api-filter" placeholder="Type to filter APIs">
+        </div>
+
+        <div id="api-tabview-panel">
+            <ul id="api-classes" class="apis classes">
+            
+                <li><a href="../classes/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../classes/UI.html">UI</a></li>
+            
+                <li><a href="../classes/UI.COLOR.html">UI.COLOR</a></li>
+            
+                <li><a href="../classes/UI.FONT.html">UI.FONT</a></li>
+            
+                <li><a href="../classes/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../classes/UI.SHADOW.html">UI.SHADOW</a></li>
+            
+                <li><a href="../classes/UI.View.html">UI.View</a></li>
+            
+            </ul>
+
+            <ul id="api-modules" class="apis modules">
+            
+                <li><a href="../modules/PKObject.html">PKObject</a></li>
+            
+                <li><a href="../modules/UI.html">UI</a></li>
+            
+                <li><a href="../modules/UI.Label.html">UI.Label</a></li>
+            
+                <li><a href="../modules/UI.View.html">UI.View</a></li>
+            
+            </ul>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </div>
+        <div class="yui3-u-3-4">
+                <div id="api-options">
+        Show:
+        <label for="api-show-inherited">
+            <input type="checkbox" id="api-show-inherited" checked>
+            Inherited
+        </label>
+
+        <label for="api-show-protected">
+            <input type="checkbox" id="api-show-protected">
+            Protected
+        </label>
+
+        <label for="api-show-private">
+            <input type="checkbox" id="api-show-private">
+            Private
+        </label>
+        <label for="api-show-deprecated">
+            <input type="checkbox" id="api-show-deprecated">
+            Deprecated
+        </label>
+
+    </div>
+
+
+            <div class="apidocs">
+                <div id="docs-main">
+                    <div class="content">
+                        <h1 class="file-heading">File: demo/platforms/ios/build/YASMFDemoApp.app/www/framework/ui-view.js</h1>
+
+<div class="file">
+    <pre class="code prettyprint linenums">
+/******************************************************************************
+ *
+ * UI-VIEW
+ * Author: Kerri Shotts
+ * Version: 0.3
+ *
+ * UI-VIEW provides the UI.View object
+ *
+ ******************************************************************************/
+/*jshint
+         asi:true,
+         bitwise:true,
+         browser:true,
+         curly:true,
+         eqeqeq:false,
+         forin:true,
+         noarg:true,
+         noempty:true,
+         plusplus:false,
+         smarttabs:true,
+         sub:true,
+         trailing:false,
+         undef:true,
+         white:false,
+         onevar:false 
+ */
+/*global PKObject, PKUTIL, PKUI */
+PKUTIL.require ( [&quot;PKUTIL&quot;, &quot;UI&quot;, &quot;PKObject&quot;, &quot;PKUI&quot;], function () 
+{ 
+    PKUTIL.export ( &quot;UIView&quot; );
+});
+
+var UI = UI || {};
+
+UI.View = function ()
+{
+  var self = new PKObject();
+  self.subclass ( &quot;UIView&quot; );
+
+  // register any notifications
+  self.registerNotification ( &quot;boundsDidChange&quot; );
+  self.registerNotification ( &quot;frameDidChange&quot; );
+  self.registerNotification ( &quot;backgroundColorDidChange&quot; );
+  self.registerNotification ( &quot;opacityDidChange&quot; );
+  self.registerNotification ( &quot;visibilityDidChange&quot; );
+  self.registerNotification ( &quot;viewWillAppear&quot; );
+  self.registerNotification ( &quot;viewDidAppear&quot; );
+  self.registerNotification ( &quot;viewWillDisappear&quot; );
+  self.registerNotification ( &quot;viewDidDisappear&quot; );
+  self.registerNotification ( &quot;viewDidInit&quot; );
+
+
+  /**
+   *
+   * All views have direct DOM representations
+   *
+   */
+  self._element = null; 
+  /**
+   *
+   * All views have subviews
+   *
+   */
+  self._subViews = [];
+  self._superView = null;
+  self.addSubView = function ( theView )
+  {
+    self._subViews.push ( theView );
+    theView._superView = self;
+
+    // make sure our element knows about it.
+    self._element.appendChild ( theView._element );
+  };
+  self.removeSubView = function ( theView )
+  {
+    self._subViews.splice ( self._subViews.indexOf(theView), 1 );
+    theView._superView = null;
+
+    // and our element needs to be removed
+    self._element.removeChild ( theView._element );
+  };
+  self.removeFromSuperView = function ()
+  {
+    self._superView.removeSubView ( self );
+  };
+  self.getSubViews = function ()
+  {
+    return self._subViews;
+  }
+  self.getSuperView = function ()
+  {
+    return self._superView;
+  }
+  self.__defineGetter__ ( &quot;subViews&quot;, self.getSubViews );
+  self.__defineGetter__ ( &quot;superView&quot;, self.getSuperView );
+
+  /**
+   *
+   * All views have bounds and frames.
+   *
+   */
+  self._bounds = UI.zeroRect();
+  self._frame = UI.zeroRect();
+  self.getBounds = function ()
+  {
+    return self._bounds;
+  }
+  self.setBounds = function ( newBounds )
+  {
+    self._bounds = UI.copyRect ( newBounds );
+    if (!self._frame)
+    {
+      self._frame = UI.zeroRect();
+    }
+    if (self._frame.size.w != self._bounds.size.w ||
+        self._frame.size.h != self._bounds.size.h)
+    {
+      self._frame.size = UI.copySize ( newBounds.size );
+      self.notify (&quot;boundsDidChanged&quot;);
+      self.notify (&quot;frameDidChange&quot;);
+    }
+  }
+  self.getFrame = function ()
+  {
+    return self._frame;
+  }
+  self.setFrame = function( newFrame )
+  {
+    self._frame = UI.copyRect ( newFrame );
+    if (!self._bounds)
+    {
+      self._bounds = UI.zeroRect();
+    }
+    if ( self._bounds.size.w != self._frame.size.w ||
+         self._bounds.size.h != self._frame.size.h )
+    {
+      self._bounds.size = UI.copySize ( newFrame.size );
+      self.notify (&quot;boundsDidChange&quot;);      
+    }
+    self.notify (&quot;frameDidChange&quot;);
+  }
+  self.__defineGetter__(&quot;bounds&quot;, self.getBounds);
+  self.__defineSetter__(&quot;bounds&quot;, self.setBounds);
+  self.__defineGetter__(&quot;frame&quot;, self.getFrame);
+  self.__defineSetter__(&quot;frame&quot;, self.setFrame);
+
+  self._useGPU = false;
+  self._useGPUForPositioning = false;
+  self.getUseGPU = function ()
+  {
+    return self._useGPU;
+  }
+  self.getUseGPUForPositioning = function ()
+  {
+    return self._useGPUForPositioning;
+  }
+  self.setUseGPU = function ( v )
+  {
+    self._useGPU = v;
+    if (v)
+    {
+      if (!self._useGPUForPositioning)
+      {
+        self._element.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+      }
+      else
+      {
+        self._element.style.webkitTransform = &quot;translate3d(&quot; + self._frame.origin.x + &quot;px,&quot; + self._frame.origin.y + &quot;px,0)&quot;;
+//        self._element.style.webkitTransform = &quot;translate(&quot; + self._frame.origin.x + &quot;px,&quot; + self._frame.origin.y + &quot;px)&quot;;
+      }
+    }
+    else
+    {
+      self._element.style.webkitTransform = &quot;inherit&quot;;
+    }
+  }
+  self.setUseGPUForPositioning = function ( v )
+  {
+    self._useGPUForPositioning = v;
+    if (v &amp;&amp; self._useGPU)
+    {
+      self._element.style.top = &quot;&quot;;
+      self._element.style.left = &quot;&quot;;
+    }
+    else
+    {
+      if (self._useGPU)
+      {
+        self._element.style.webkitTransform = &quot;translate3d(0,0,0)&quot;;
+      }
+      else
+      {
+        self._element.style.webkitTransform = &quot;&quot;;
+      }
+    }
+    self.notify ( &quot;frameDidChange&quot; );
+  }
+  self.__defineGetter__(&quot;useGPU&quot;, self.getUseGPU);
+  self.__defineSetter__(&quot;useGPU&quot;, self.setUseGPU);
+  self.__defineGetter__(&quot;useGPUForPositioning&quot;, self.getUseGPUForPositioning);
+  self.__defineSetter__(&quot;useGPUForPositioning&quot;, self.setUseGPUForPositioning);
+
+  /**
+   *
+   * recalculates the element&#x27;s position based on
+   * the frame. It also calls calcElement() for the
+   * object, if defined. After that, it calls the
+   * _calcElement for every subview, in case they
+   * decide to be re-positioned.
+   *
+   */
+  self._calcElement = function ( o, n )
+  {    
+    // allow us the opportunity to override
+    if ( n == &quot;frameDidChange&quot; )
+    {
+      if (self.calcElement)
+      {
+        self.calcElement();
+      }
+    }
+
+    // and notify all our sub views if our bounds have changed
+    if ( n == &quot;boundsDidChange&quot; )
+    {
+      for (var i=0; i&lt;self._subViews.length; i++)
+      {
+        if ( self._subViews[i]._calcElement )
+        {
+          self._subViews[i]._calcElement();
+        }
+      }
+    }
+  }
+  self.calcElement = function ()
+  {
+    // only change properties that have changed
+    if (self._element.style.position != &quot;absolute&quot;) { self._element.style.position = &quot;absolute&quot;; }
+    if (self._useGPUForPositioning &amp;&amp; self._useGPU)
+    {
+      self._element.style.webkitTransform = &quot;translate3d(&quot; + self._frame.origin.x + &quot;px,&quot; + self._frame.origin.y + &quot;px,0)&quot;;  
+//      self._element.style.webkitTransform = &quot;translate(&quot; + self._frame.origin.x + &quot;px,&quot; + self._frame.origin.y + &quot;px)&quot;;  
+    }
+    else
+    {
+      if (self._frame.origin.y + &quot;px&quot; != self._element.style.top) { self._element.style.top = self._frame.origin.y + &quot;px&quot;; }
+      if (self._frame.origin.x + &quot;px&quot; != self._element.style.left) { self._element.style.left = self._frame.origin.x + &quot;px&quot;; }
+    }
+    if (self._frame.size.w + &quot;px&quot; != self._element.style.width) { self._element.style.width = self._frame.size.w + &quot;px&quot;; }
+    if (self._frame.size.h + &quot;px&quot; != self._element.style.height) { self._element.style.height = self._frame.size.h + &quot;px&quot;; }
+    
+  }
+  // when our frame changes, we must know. Call self._calcElement
+  self.addListenerForNotification ( &quot;frameDidChange&quot; , self._calcElement );
+
+  /**
+   *
+   * Every view has a background color, even if it is transparent.
+   *
+   */
+  self._backgroundColor = null;
+  self.getBackgroundColor = function ()
+  {
+    return self._backgroundColor;
+  };
+  self.setBackgroundColor = function ( theColor )
+  {
+    self._backgroundColor = UI.copyColor(theColor);
+    self._element.style.backgroundColor = UI._colorToRGBA (theColor);
+    self.notify (&quot;backgroundColorDidChange&quot;);
+  };
+
+  self.__defineGetter__(&quot;backgroundColor&quot;, self.getBackgroundColor);
+  self.__defineSetter__(&quot;backgroundColor&quot;, self.setBackgroundColor);
+
+  /**
+   *
+   * Every view can be shown or hidden
+   *
+   */
+  self._visible = true;
+  self.getVisibility = function ()
+  {
+    return self._visible;
+  }
+  self.setVisibility = function ( visibility )
+  {
+    if (self._visible != visibility)
+    {
+      self.notify ( visibility ? &quot;viewWillAppear&quot; : &quot;viewWillDisappear&quot; );
+      self._visible = visibility;
+      self._element.style.display = ( visibility ? &quot;inherit&quot; : &quot;none&quot; );
+      self.notify ( visibility ? &quot;viewDidAppear&quot; : &quot;viewDidDisappear&quot; );
+      self.notify ( &quot;visibilityDidChange&quot; );
+    }
+  }
+  self.__defineGetter__(&quot;visible&quot;, self.getVisibility);
+  self.__defineSetter__(&quot;visible&quot;, self.setVisibility);
+
+  /**
+   *
+   * Every view has opacity
+   *
+   */
+  self._opacity = 1.0;
+  self.getOpacity = function ()
+  {
+    return self._opacity;
+  }
+  self.setOpacity = function ( opacity )
+  {
+    if (self._opacity != opacity)
+    {
+      self._opacity = opacity;
+      self._element.style.opacity = opacity;
+      self.notify ( &quot;opacityDidChange&quot; );
+    }
+  }
+  self.__defineGetter__(&quot;opacity&quot;, self.getOpacity);
+  self.__defineSetter__(&quot;opacity&quot;, self.setOpacity);
+
+  /**
+   *
+   * Views can override their scrolling
+   *
+   */
+  self._overflow = &quot;inherit&quot;;
+  self.getOverflow = function ()
+  {
+    return self._overflow;
+  }
+  self.setOverflow = function ( v )
+  {
+    self._overflow = v;
+    self._element.style.overflow = v;
+  }
+  self.__defineGetter__(&quot;overflow&quot;, self.getOverflow);
+  self.__defineSetter__(&quot;overflow&quot;, self.setOverflow);
+
+  /**
+   *
+   * event processing
+   *
+   */
+  self._touchStart = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    if (!self._element.className )
+    {
+      self._element.oldClassName = &quot;&quot;;
+    }
+    else
+    {
+      self._element.oldClassName = self._element.className;
+    }
+    self._element.className += &quot; touched &quot;;
+    if (self.touchStart)
+    {
+      return self.touchStart ( event );
+    }
+  }
+
+  self._touchMove = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    if (self._element.oldClassName)
+    {
+      self._element.className = self._element.oldClassName;
+    }
+    if (self.touchMove)
+    {
+      return self.touchMove ( event );
+    }
+  }
+
+  self._touchEnd = function ( e )
+  {
+    var event = UI.makeEvent ( e || window.event );
+    self._element.className = self._element.oldClassName;
+    if (self.touchEnd)
+    {
+      return self.touchEnd ( event );
+    }
+  }
+
+  /**
+   *
+   * init
+   *
+   */
+  self.overrideSuper ( self.class, &quot;init&quot;, self.init );
+  self.init = function ( noNotify )
+  {
+    // super first
+    self.super ( &quot;UIView&quot;, &quot;init&quot; );
+
+    // any view initialization
+    self._element = document.createElement ( self.class );
+    PKUI.CORE.addTouchListener ( self._element, &quot;touchstart&quot;, self._touchStart );
+    PKUI.CORE.addTouchListener ( self._element, &quot;touchmove&quot;, self._touchMove );
+    PKUI.CORE.addTouchListener ( self._element, &quot;touchend&quot;, self._touchEnd );
+    //self.backgroundColor = UI.COLOR.lightGrayColor();
+
+    // notify of the initialization
+    if (!noNotify) { self.notify ( &quot;viewDidInit&quot; ); }
+  };
+  self.initWithFrame = function ( theFrame )
+  {
+    self.init();
+    self.frame = theFrame;
+  };
+  self.initWithOptions = function ( options )
+  {
+    self.init();
+    if (options.frame)              { self.frame = options.frame; }
+    if (options.backgroundColor)    { self.backgroundColor = options.backgroundColor; }
+    if (options.visible)            { self.visible = options.visible; }
+    if (options.opacity)            { self.opacity = options.opacity; }
+    if (options.useGPU)             { self.useGPU = options.useGPU; }
+    if (options.useGPUForPositioning) { self.useGPUForPositioning = options.useGPUForPositioning; }
+    if (options.overflow)           { self.overflow = options.overflow; }
+  };
+
+  return self;
+
+}
+    </pre>
+</div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="../assets/vendor/prettify/prettify-min.js"></script>
+<script>prettyPrint();</script>
+<script src="../assets/js/yui-prettify.js"></script>
+<script src="../assets/../api.js"></script>
+<script src="../assets/js/api-filter.js"></script>
+<script src="../assets/js/api-list.js"></script>
+<script src="../assets/js/api-search.js"></script>
+<script src="../assets/js/apidocs.js"></script>
+</body>
+</html>
