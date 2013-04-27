@@ -495,7 +495,8 @@ div {
 }
 
 
-.preventClicks
+.preventClicks,
+#preventClicks
 {
   position: absolute;
   z-index: 999999;
