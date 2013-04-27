@@ -1,3 +1,13 @@
+/**
+ *
+ * YASMF Demo Application
+ *
+ * This application seeks to demonstrate most of the features in YASMF while also
+ * looking and acting somewhat like a real application. (By that I mean, the demo
+ * isn't going to be just about dropping a lot of widgets on the screen with no
+ * functionality).
+ *
+ */
 /*jshint
          asi:true,
          bitwise:true,
@@ -17,14 +27,27 @@
          onevar:false 
  */
 /*global PKLOC, PKUTIL, PKUI, UI, device, cordova, console , $ge*/
+
+/**
+ *
+ * Our application lives under the APP namespace
+ *
+ */
 var APP = APP || {};
 
+/**
+ *
+ * pretty much does what it says though this could, just as easily,
+ * be done largely in index.html as well. Really more to your preference,
+ * honestly.
+ *
+ * We fire off the localization initialization when it is complete.
+ */
 APP.loadLibraries = function ()
 {
+    PKUTIL.consoleLogging = true;
     PKUTIL.include ( ["./framework/localization.js",
                       "./framework/device.js",
-                      "./framework/ui-core.js",
-                      "./framework/ui-msg.js",
                       "./framework/ui-gestures.js",
                       "./framework/fileutil.js",
                       "./framework/pk-object.js",
@@ -34,7 +57,13 @@ APP.loadLibraries = function ()
                      ].reverse(),
                      APP.initLocalization );
 }
+document.addEventListener ( "deviceready", APP.loadLibraries, false );
 
+/**
+ *
+ * Load the localization locales, and when done, call APP.init
+ *
+ */
 APP.initLocalization = function ()
 {
     PKLOC.initializeGlobalization(function ()
@@ -46,15 +75,26 @@ APP.initLocalization = function ()
     });
 }
 
+/**
+ *
+ * Add any values that should exist in the translation matrix at the
+ * start of the app, then call APP.start.
+ *
+ */
 APP.init = function ()
 {
     PKLOC.addTranslation ("en", "BACK", "Back");
     APP.start();
-    PKUI.CORE.initializeApplication();
 
     // ready.
 }
 
+/**
+ *
+ * Called when the application is ready to be started. Here we
+ * can load, display, and manipulate views and data.
+ *
+ */
 APP.start = function ()
 {
     var aView = new UI.View();
@@ -67,7 +107,6 @@ APP.start = function ()
                     frame: UI.makeRect ( UI.makePoint(10,10), UI.offsetSize( UI.screenSize(), UI.makeSize (-20, -20) ) ) 
         } 
     );
-    $ge("rootContainer").appendChild(aView._element);
 
     var scrollView = new UI.View();
     var aRect = aView.bounds;
@@ -101,7 +140,7 @@ APP.start = function ()
 
     aView.overflow = "scroll";
 
-    //APP.animate();
+    UI.setRootView ( aView );
 }
 
 APP.animate = function ()
@@ -114,4 +153,3 @@ APP.animate = function ()
     }
 }
 
-document.addEventListener ( "deviceready", APP.loadLibraries, false );
