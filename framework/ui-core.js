@@ -1,10 +1,10 @@
-/******************************************************************************
- *
- * UI-CORE
- * Author: Kerri Shotts
- *
+/**
  * This script provides a lot of the core user interface framework, such as
  * loading content via AJAX, transitions, and more.
+ * @module PKUI
+ * @requires PKUTIL, PKDEVICE
+ * @author Kerri Shotts
+ * @version 0.3
  *
  ******************************************************************************/
 /*jshint
@@ -31,12 +31,39 @@ PKUTIL.require ( ["PKUTIL", "PKDEVICE"], function ()
     PKUTIL.export ( [ "PKUI", "PKUI.CORE"] );
 });
 
+/**
+ *
+ * PKUI provides the legacy (v0.2) UI framework (including a view hierarchy)
+ * and other various utility functions that are still applicable to newer
+ * versions.
+ *
+ * Where possible, one should use the newer methods that supersede the
+ * framework methods.
+ *
+ * @class PKUI
+ */
 var PKUI = PKUI ||
 {
 };
 // create the namespace
+/**
+ * Version of the class in {major:,minor:,rev:} form.
+ *
+ * @property version
+ * @type Object
+ */
 PKUI.version = { major: 0, minor: 3, rev: 100 };
 
+/**
+ * PKUI.CORE provides the legacy (v0.2) UI framework (including a view hierarchy)
+ * and other various utility functions that are still applicable to newer
+ * versions.
+ *
+ * Where possible, one should use the newer methods that supersede the
+ * framework methods.
+ *
+ * @class PKUI.CORE
+ */
 PKUI.CORE = PKUI.CORE ||
 {
 }// create the CORE space
@@ -47,33 +74,108 @@ PKUI.CORE.TABBAR = PKUI.CORE.TABBAR ||
 //
 // Properties
 //
+/**
+ * Determines whether console logs are generated; if `true`, various functions
+ * will generate logging information to the console.
+ *
+ * @property consoleLogging
+ * @type boolean
+ * @default false
+ */
 PKUI.CORE.consoleLogging = false;
-// If TRUE, we'll write UI logs out to the console.
+
+/**
+ * Controls the view stack. It does not have the concept of multiple views
+ * on-screen at once, so for split-view apps, this isn't nearly sufficient,
+ * but it works for simple apps.
+ *
+ * @property viewStack
+ * @type Array
+ * @default empty
+ */
 PKUI.CORE.viewStack = Array();
-// Contains the view stack
+
+/**
+ * Points at the view at the top of the viewStack. (Generally, this one
+ * that is visible).
+ *
+ * @property currentView
+ * @type Object
+ * @default null
+ */
 PKUI.CORE.currentView = null;
-// Points at the /current/ view
-PKUI.CORE.useTransforms = true; //true;
-// animation; if true, uses 3D transforms
+
+/**
+ * If `true`, 3D transforms and transitions are used instead of the slower,
+ * jerkier javascript transitions.
+ *
+ * @property useTransforms
+ * @type boolean
+ * @default true
+ */
+PKUI.CORE.useTransforms = true; 
+
+/**
+ * Determines the interval to use between JS animations when not using
+ * 3D transforms.
+ *
+ * @property jsaInterval
+ * @type Number
+ * @default 16
+ */
 PKUI.CORE.jsaInterval = 16;
 
-// if true, use animation when popping and pushing views
+/**
+ * If `true`, use animation when pushing and popping views.
+ *
+ * @property animate
+ * @type boolean
+ * @default true
+ */
 PKUI.CORE.animate = true;
 
-// if true, install a global back button handler
+/**
+ * It turns out that PG doesn't really like having to support multiple
+ * back button handlers, and so if `true`, we'll install a global
+ * back button handler to help do the work for us.
+ *
+ * @property captureBackButton
+ * @type boolean
+ * @default true
+ */
 PKUI.CORE.captureBackButton = true;
-// used to keep track of the last time a back button was pressed
+/**
+ * Keep track of the list time the back button was pressed, so we can
+ * prevent double bounces.
+ *
+ * @property _lastBackButtonTime
+ * @private
+ * @type Number
+ * @default -1
+ */
 PKUI.CORE._lastBackButtonTime = -1;
 
-// the interval to use when calling applyTouchListeners automatically.
-// If 0, they will not be called, and must be called manually after
-// every DOM change. 
+/** 
+ * the interval to use when calling applyTouchListeners automatically.
+ * If 0, they will not be called, and must be called manually after
+ * every DOM change. 
+ *
+ * @property listenerInterval
+ * @type Number
+ * @default 100
+ */
 PKUI.CORE.listenerInterval = 100;
 
-// Determines how push,pop,swap, etc., are handled
-// if "fullscreen", all views take up the entire screen.
-// if "column", all views take up the _columnWidth specified
-//              in the view.
+/**
+ * Determines how push,pop,swap, etc., are handled
+ * if "fullscreen", all views take up the entire screen.
+ * if "column", all views take up the _columnWidth specified
+ *              in the view.
+ *
+ * @property viewHandlingMethod
+ * @type String
+ * @default "fullscreen"
+ */
 PKUI.CORE.viewHandlingMethod = "fullscreen";
 
 
@@ -96,6 +198,8 @@ PKUI.CORE.viewHandlingMethod = "fullscreen";
  * are problematic, we force the user to wait 1s before the next
  * back button is accepted.
  *
+ * @method handleBackButton
+ * @static
  */
 PKUI.CORE.handleBackButton = function ()
 {
@@ -132,6 +236,9 @@ PKUI.CORE.handleBackButton = function ()
  *  - in this version of the framework, we force an orientation update.
  *  - by default, we attach a global back button handler
  *  - we deisable animations and transforms for Android and WP7.
+ *
+ * @method initializeApplication
+ * @static
  */
 PKUI.CORE.initializeApplication = function()
 {
@@ -179,6 +286,8 @@ PKUI.CORE.initializeApplication = function()
  * Called on first-start and whenever the orientation changes. It updates the
  * body's class to reflect the device, formfactor, orientation, and scaling.
  *
+ * @method updateOrientation
+ * @static
  */
 PKUI.CORE.updateOrientation = function()
 {
@@ -214,6 +323,10 @@ PKUI.CORE.updateOrientation = function()
  *    END VIEW STACK DUMP
  *
  * (H) = hidden; (V) = visible; =CURRENT= = the top view on the stack
+ *
+ * @method dumpViewStack
+ * @static
+ * @param msg {String} a string to display
  */
 PKUI.CORE.dumpViewStack = function( msg )
 {
@@ -237,6 +350,10 @@ PKUI.CORE.dumpViewStack = function( msg )
 
 /*
  * Calculate the width of the visible views
+ *
+ * @method visibleViewsWidth
+ * @static
+ * @returns {Number} the width of all the visible views
  */
 PKUI.CORE.visibleViewsWidth = function ()
 {
@@ -263,6 +380,10 @@ PKUI.CORE.visibleViewsWidth = function ()
  * Shows a view and pushes it on the viewStack. NO ANIMATION.
  * DOES NOT PROPERLY CALL viewWillHide/viewDidHide of any view, since there
  * may be no view visible.
+ *
+ * @method showView
+ * @static
+ * @param theView {Object} the view to display
  *
  */
 PKUI.CORE.showView = function(theView)
@@ -291,6 +412,9 @@ PKUI.CORE.showView = function(theView)
  * DOES NOT ATTEMPT TO CALL viewWillShow or viewDidShow of any view
  * on the stack, as there may not be any view visible.
  *
+ * @method hideView
+ * @static
+ * @param theView {Object} the view to hide
  */
 PKUI.CORE.hideView = function(theView)
 {
@@ -315,6 +439,9 @@ PKUI.CORE.hideView = function(theView)
  *
  * Swaps a view on the stack with the desired view. NO ANIMATION.
  *
+ * @method swapView
+ * @static
+ * @param theView {Object} the view to swap (with the current view)
  */
 PKUI.CORE.swapView = function (theView)
 {
@@ -353,6 +480,11 @@ PKUI.CORE.swapView = function (theView)
 
 }
 
+/**
+ * @method jsaPush
+ * @static
+ * @deprecated
+ */
 PKUI.CORE.jsaPush = function(theViewHiding, theViewShowing, duration)
 {
   var theStartTime = (new Date()).getTime();
@@ -381,6 +513,11 @@ PKUI.CORE.jsaPush = function(theViewHiding, theViewShowing, duration)
   }, PKUI.CORE.jsaInterval);
 }
 
+/**
+ * @method jsaPop
+ * @static
+ * @deprecated
+ */
 PKUI.CORE.jsaPop = function(theViewHiding, theViewShowing, duration)
 {
   var theStartTime = (new Date()).getTime();
@@ -407,6 +544,15 @@ PKUI.CORE.jsaPop = function(theViewHiding, theViewShowing, duration)
   }, PKUI.CORE.jsaInterval);
 }
 
+/**
+ * Pushes a view onto the stack, and renders it as a column. Intended
+ * only to be used if the `viewHandlingMethod` property is `column`.
+ * 
+ * @method pushColumnView
+ * @private
+ * @static
+ * @param theView {Object} the view to push
+ */
 PKUI.CORE.pushColumnView = function (theView)
 {
   theView.style.maxWidth = "" + (theView._columnWidth || 320) + "px";
@@ -427,6 +573,15 @@ PKUI.CORE.pushColumnView = function (theView)
 
 }
 
+/**
+ * Pops the view off the stack. Intended
+ * only to be used if the `viewHandlingMethod` property is `column`.
+ * 
+ * @method popColumnView
+ * @private
+ * @static
+ * @param [theView=null] {Object} the view to pop
+ */
 PKUI.CORE.popColumnView = function (theView)
 {
   // if theView is null, we assume the last view on the stack
@@ -480,6 +635,13 @@ PKUI.CORE.popColumnView = function (theView)
 
 }
 
+/**
+ * Pops to a specific view without animation.
+ * 
+ * @method popToView
+ * @static
+ * @param theView {Object} the view to pop to.
+ */
 PKUI.CORE.popToView = function (theView)
 {
   var theViewIndex = 0;
@@ -507,6 +669,9 @@ PKUI.CORE.popToView = function (theView)
  * Shows a view WITH ANIMATION and pushes it onto the view stack.
  * The animation is a slide from right to left.
  *
+ * @method pushView
+ * @static
+ * @param theView {Object} the view to push
  */
 PKUI.CORE.pushView = function(theView)
 {
@@ -665,6 +830,8 @@ PKUI.CORE.pushView = function(theView)
  *
  * Hides a view WITH ANIMATION and pops it from the stack.
  *
+ * @method popView
+ * @static
  */
 PKUI.CORE.popView = function()
 {
@@ -862,6 +1029,10 @@ PKUI.CORE.popView = function()
  *   touchmove  = mousemove
  *   touchend   = mouseup
  *
+ * @method translateWindowsEvents
+ * @static
+ * @private
+ * @param theEvent {DOMEvent}
  */
 PKUI.CORE.translateWindowsEvents = function(theEvent)
 {
@@ -879,6 +1050,13 @@ PKUI.CORE.translateWindowsEvents = function(theEvent)
 
 /*
  * Adds a touch listener to theElement, converting touch events for WP7.
+ *
+ * @method addTouchListener
+ * @static
+ * @param theElement {DOMElement} the element to attach the event to
+ * @param theEvent {String} the event to handle
+ * @param theFunction {Function} the function to call when the event is fired
+ *
  */
 PKUI.CORE.addTouchListener = function(theElement, theEvent, theFunction)
 {
@@ -888,6 +1066,13 @@ PKUI.CORE.addTouchListener = function(theElement, theEvent, theFunction)
 
 /*
  * Removes a touch listener added by addTouchListener
+ *
+ * @method removeTouchListener
+ * @static
+ * @param theElement {DOMElement} the element to remove an event from
+ * @param theEvent {String} the event to remove
+ * @param theFunction {Function} the function to remove
+ *
  */
 PKUI.CORE.removeTouchListener = function(theElement, theEvent, theFunction)
 {
@@ -897,6 +1082,10 @@ PKUI.CORE.removeTouchListener = function(theElement, theEvent, theFunction)
 
 /*
  * Cancels the event in just about every cross-platform way imaginable.
+ *
+ * @method cancelEvent
+ * @static
+ * @param theEvent {DOMEvent} the event to cancel
  */
 PKUI.CORE.cancelEvent = function(theEvent)
 {
@@ -925,8 +1114,10 @@ PKUI.CORE.cancelEvent = function(theEvent)
  *
  * Applies touch listeners to various items in the dom.
  *
- * In this version of the framework, we apply it to BUTTONs.
+ * In this version of the framework, we apply it to BUTTONs and Anchors.
  *
+ * @method applyTouchListeners
+ * @static
  */
 PKUI.CORE.applyTouchListeners = function()
 {
@@ -968,6 +1159,9 @@ PKUI.CORE.applyTouchListeners = function()
 /*
  * for platforms that support it,
  * hide the splash screen when called.
+ *
+ * @method hideSplash
+ * @static
  */
 PKUI.CORE.hideSplash = function ()
 {
