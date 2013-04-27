@@ -3,7 +3,7 @@
  * UI-VIEW provides the UI.View object
  * @namespace UI
  * @module UI.View
- * @requires PKUTIL, UI, PKObject, PKUI
+ * @requires PKUTIL, UI, PKObject
  * @author Kerri Shotts
  * @version 0.3
  ******************************************************************************/
@@ -24,9 +24,9 @@
          white:false,
          onevar:false 
  */
-/*global PKObject, PKUTIL, PKUI */
+/*global PKObject, PKUTIL */
 
-PKUTIL.require ( ["PKUTIL", "UI", "PKObject", "PKUI" ], function () 
+PKUTIL.require ( ["PKUTIL", "UI", "PKObject" ], function () 
 { 
     PKUTIL.export ( "UIView" );
 });
@@ -531,7 +531,6 @@ UI.View = function ()
    * @method _calcElement
    * @param o {PKObject} the object being calc'd
    * @param n {String} the notification
-   */
    */
   self._calcElement = function ( o, n )
   {    
@@ -1101,9 +1100,9 @@ UI.View = function ()
     {
       if (!self._touchHandlersAdded)
       {
-        PKUI.CORE.addTouchListener ( self._element, "touchstart", self._touchStart );
-        PKUI.CORE.addTouchListener ( self._element, "touchmove", self._touchMove );
-        PKUI.CORE.addTouchListener ( self._element, "touchend", self._touchEnd );      
+        UI._addEventListener ( self._element, "touchstart", self._touchStart );
+        UI._addEventListener ( self._element, "touchmove", self._touchMove );
+        UI._addEventListener ( self._element, "touchend", self._touchEnd );      
       }
       self._touchHandlersAdded = true;
     }
@@ -1111,9 +1110,9 @@ UI.View = function ()
     {
       if (self._touchHandlersAdded)
       {
-        PKUI.CORE.removeTouchListener ( self._element, "touchstart", self._touchStart );
-        PKUI.CORE.removeTouchListener ( self._element, "touchmove", self._touchMove );
-        PKUI.CORE.removeTouchListener ( self._element, "touchend", self._touchEnd );
+        UI._removeEventListener ( self._element, "touchstart", self._touchStart );
+        UI._removeEventListener ( self._element, "touchmove", self._touchMove );
+        UI._removeEventListener ( self._element, "touchend", self._touchEnd );
         self._touchHandlersAdded = false;        
       }
     }
