@@ -1,9 +1,10 @@
-/******************************************************************************
- *
- * UTILITY
- * Author: Kerri Shotts
+/**
  *
  * This library includes simple utility functions
+ * @module PKUTIL
+ * @author Kerri Shotts
+ * @requires PKLOC
+ * @version 0.3
  *
  ******************************************************************************/
 /*jshint
@@ -26,86 +27,13 @@
  */
 /*global PKLOC, device, cordova, console */
 /*requires: cordova.js*/
-var PKUTIL = PKUTIL ||
-{
-};
-// create the namespace
-PKUTIL.version = { major: 0, minor: 3, rev: 100 };
-
-//
-// Properties
-//
-PKUTIL.consoleLogging = false; // add console logging flag, v0.3.100
-PKUTIL.COMPLETION_SUCCESS = true;
-PKUTIL.COMPLETION_FAILURE = false;
-
-//
-// Methods
-//
-
-/**
- *
- * Checks to see if the dependency has already been loaded.
- *
- */
-PKUTIL._dependencies = [];
-PKUTIL.export = function ( dependency )
-{
-  if (dependency.push)
-  {
-    // probably an array; use it as such
-    for (var i=0; i<dependency.length; i++)
-    {
-      PKUTIL._dependencies.push ( dependency[i] );
-    }
-  }
-  else
-  {
-    PKUTIL._dependencies.push ( dependency );
-  }
-}
-PKUTIL.require = function ( dependency, completion )
-{
-  if (!dependency)
-  {
-    return true;
-  }
-  var allRequires;
-  if (dependency.push)
-  {
-    allRequires = dependency;
-  }
-  else
-  {
-    allRequires = [ dependency ];
-  }
-  var allDepenciesMet = true;
-  for (var i=0; i<allRequires.length; i++)
-  {
-    var dependencyMet = PKUTIL._dependencies.indexOf ( allRequires[i] ) > -1;
-    if (!dependencyMet)
-    {
-      if (PKUTIL.consoleLogging) { console.log ("[WARN] Dependency " + allRequires[i] + " not met."); }
-      throw "Dependency Failure";
-    }
-    allDepenciesMet = allDepenciesMet && dependencyMet; 
-  }
-  if (allDepenciesMet)
-  {
-    if (completion)
-    {
-      completion();
-    }
-  }
-  return allDepenciesMet;
-}
-PKUTIL.export ( "PKUTIL" );
-PKUTIL.require ( null );
 
 /**
  *
  * Returns an element specified by elementId. Similar to (but not exactly like) jQuery's $()
  *
+ * @method $ge
+ * @returns {DOMElement}
  */
 function $ge(elementId)
 {
@@ -118,6 +46,9 @@ function $ge(elementId)
  * you have at least one element of the form <elementId_enus>, and that all other localized
  * elements have the locale after the elementId appended with an underscore.
  * (eg: thisElementIsLocalized_enus and thisElementIsLocalized_eses)
+ *
+ * @method $geLocale
+ * @returns {DOMElement}
  */
 function $geLocale(elementId)
 {
@@ -154,36 +85,209 @@ function $geLocale(elementId)
  *
  * Similar to $$. Returns all classes matching a selector.
  *
+ * @method $gac
+ * @returns {Array} of DOMElements.
  */
 function $gac(selector)
 {
   return Array.prototype.slice.call(document.querySelectorAll(selector));
 }
 
+
+/**
+ * Provides lots of various utility functions; think of this as the
+ * framework's basement. :-)
+ *
+ * @class PKUTIL
+ *
+ */
+var PKUTIL = PKUTIL ||
+{
+};
+// create the namespace
+
+/**
+  * Version of the PKUTIL Namespace
+  * @property version
+  * @type Object
+ **/
+PKUTIL.version = { major: 0, minor: 3, rev: 100 };
+
+//
+// Properties
+//
+/**
+ * Determines if various methods log to the console. Added 0.3.100
+ *
+ * @property consoleLogging
+ * @type boolean
+ * @static
+ * @default false
+ */
+PKUTIL.consoleLogging = false; // add console logging flag, v0.3.100
+
+/**
+ * Indicates success of an operation.
+ * 
+ * @property COMPLETION_SUCCESS
+ * @final
+ * @static
+ * @default true
+ */
+PKUTIL.COMPLETION_SUCCESS = true;
+/**
+ * Indicates failure of an operation.
+ * 
+ * @property COMPLETION_FAILURE
+ * @final
+ * @static
+ * @default false
+ */
+PKUTIL.COMPLETION_FAILURE = false;
+
+//
+// Methods
+//
+
+/*
+ *
+ * basic dependency support
+ *
+ */
+/**
+ * Tracks all dependencies that have been exported.
+ *
+ * @property _dependencies
+ * @static
+ * @private
+ * @type Array
+ * @default empty
+ */
+PKUTIL._dependencies = [];
+/**
+ * Export a module so that other modules can depend on it.
+ *
+ * @method export
+ * @static
+ * @param module {String|Array} the module name(s) to export
+ */
+PKUTIL.export = function ( dependency )
+{
+  if (dependency.push)
+  {
+    // probably an array; use it as such
+    for (var i=0; i<dependency.length; i++)
+    {
+      PKUTIL._dependencies.push ( dependency[i] );
+    }
+  }
+  else
+  {
+    PKUTIL._dependencies.push ( dependency );
+  }
+}
+
+/**
+ * Specify that a module is a dependency (or if an array, that
+ * multiple modules are dependencies), and call completion() if
+ * all dependencies are met (usually for the purpose of exporting
+ * a module).
+ *
+ * @method require
+ * @static
+ * @param dependency {String|Array} the module name(s) that this module depends on
+ * @param [completion] {Function} the method to call if all dependencies are met
+ */
+PKUTIL.require = function ( dependency, completion )
+{
+  if (!dependency)
+  {
+    return true;
+  }
+  var allRequires;
+  if (dependency.push)
+  {
+    allRequires = dependency;
+  }
+  else
+  {
+    allRequires = [ dependency ];
+  }
+  var allDepenciesMet = true;
+  for (var i=0; i<allRequires.length; i++)
+  {
+    var dependencyMet = PKUTIL._dependencies.indexOf ( allRequires[i] ) > -1;
+    if (!dependencyMet)
+    {
+      if (PKUTIL.consoleLogging) { console.log ("[WARN] Dependency " + allRequires[i] + " not met."); }
+      throw "Dependency Failure " + allRequires[i];
+    }
+    allDepenciesMet = allDepenciesMet && dependencyMet; 
+  }
+  if (allDepenciesMet)
+  {
+    if (completion)
+    {
+      completion();
+    }
+  }
+  return allDepenciesMet;
+}
+PKUTIL.export ( "PKUTIL" );
+PKUTIL.require ( null );
+
+
 /**
  *
  * Utility function to delay execution of code
  *
+ * @method delay
+ * @static
+ * @param theDelay {Number} in milliseconds
+ * @param theFunction {Function} the function to call after the delay
  */
 PKUTIL.delay = function(theDelay, theFunction)
 {
   return setTimeout(theFunction, theDelay);
 }
+
+/**
+ * The load queue; for WP7 only.
+ * 
+ * @private
+ * @property loadQueue
+ * @type Array
+ */
+PKUTIL.loadQueue = Array();
+/**
+ * Indicates if there is an XHR in progress (for WP7 loading)
+ *
+ * @private
+ * @property XHRinProgress
+ * @type boolean
+ */
+PKUTIL.XHRinProgress = false;
+/**
+ * Stores the XHR timer (for WP7 loading)
+ * @private
+ * @property XHRTimer
+ * @type Timer
+ */
+PKUTIL.XHRTimer = -1;
+
 /**
  *
  * Loads a file or URL and returns it to the completion
  * handler. The completion handler must be of the form
  * fn(success/failure, data).
  *
- * @param theFileName       the file or URL to load
- * @param aSync             if TRUE, load asynchronously
- * @param completion        completion block
+ * @method load
+ * @static
+ * @param theFileName {String} the file or URL to load
+ * @param aSync {boolean} if TRUE, load asynchronously
+ * @param completion {Function} completion block
  *
  */
-PKUTIL.loadQueue = Array();
-PKUTIL.XHRinProgress = false;
-PKUTIL.XHRTimer = -1;
-
 PKUTIL.load = function(theFileName, aSync, completion)
 {
   // if we're running on anything but Windows Phone, we call
@@ -209,6 +313,13 @@ PKUTIL.load = function(theFileName, aSync, completion)
   }
 }
 
+/**
+ * Attemts to load the next item on the loadQueue, for WP7 only.
+ *
+ * @method _XHRQueue
+ * @private
+ * @static
+ */
 PKUTIL._XHRQueue = function()
 {
   if (PKUTIL.XHRinProgress)
@@ -222,6 +333,17 @@ PKUTIL._XHRQueue = function()
   }
 }
 
+/**
+ * Loads some content, whether it be local or remote, and notifies
+ * completion when it is done.
+ *
+ * @method _load
+ * @private
+ * @static
+ * @param theFileName {String} the file or URL to load
+ * @param aSync {boolean} if TRUE, load asynchronously
+ * @param completion {Function} completion block
+ */
 PKUTIL._load = function(theFileName, aSync, completion)
 {
   if (!window.XMLHttpRequest)
@@ -276,10 +398,19 @@ PKUTIL._load = function(theFileName, aSync, completion)
  * brittle. Here's our tiny effort to help stem the tide and
  * make Javascript just a /little/ nicer.
  *
- * NOTE: includes are loaded SYNCHRONOUSLY. This is done as further
+ * NOTE: individual includes are loaded SYNCHRONOUSLY. This is done as further
  * includes may rely upon the one being loaded now. However, it does
- * mean that larger files may take longer to process.
+ * mean that larger files may take longer to process. The entire process, however
+ * is done ASYNCHRONOUSLY, so any code that relies on the included scripts must
+ * only be run after the completion.
  *
+ * Also note: Loads scripts in reverse, so one should use .reverse() when
+ * calling the method so that things are listed in a proper order.
+ *
+ * @method include
+ * @static
+ * @param theScripts {Array}
+ * @param completion {Function}
  */
 PKUTIL.include = function(theScripts, completion)
 {
@@ -297,12 +428,21 @@ PKUTIL.include = function(theScripts, completion)
   {
     if (success)
     {
-      var theScriptElement = document.createElement("script");
-      theScriptElement.type = "text/javascript";
-      theScriptElement.charset = "utf-8";
-      theScriptElement.text = data;
-      document.body.appendChild(theScriptElement);
-      // add it as a script tag
+      try
+      {
+        var theScriptElement = document.createElement("script");
+        theScriptElement.type = "text/javascript";
+        theScriptElement.charset = "utf-8";
+        theScriptElement.text = data;
+        document.body.appendChild(theScriptElement);
+        // add it as a script tag
+      }
+      catch ( e )
+      {
+        if (PKUTIL.consoleLogging) 
+          { console.log("WARNING: Error in " + theScriptName + ";" + JSON.stringify (e)); }       
+        throw e;
+      }
     } else
     {
       if (PKUTIL.consoleLogging) 
@@ -316,18 +456,24 @@ PKUTIL.include = function(theScripts, completion)
  * Loads an HTML fragment, creates a DIV, and adds it to the DOM.
  * Any script tags inside will be executed.
  *
- * @param theFileName           the file or URL to laod
- * @param options               An array of options, as follows:
- *    @param aSync                 Determines if the file is loaded
- *                                 asynchronously or not.
- *    @param id                    The ID to attach to the DIV created
- *                                 to surround the content.
- *    @param className             The class name to attach to the DIV
- *                                 created to surround the content.
- *    @param attachTo              Indicates the element to append the
- *                                 content to. If not specified,
- *                                 document.body is used.
- * @param completion            A function called when loading is
+ * The `options` parameter should contain the information specified in the example.
+ *
+ * @example
+ *     aSync                 Determines if the file is loaded
+ *                           asynchronously or not.
+ *     id                    The ID to attach to the DIV created
+ *                           to surround the content.
+ *     className             The class name to attach to the DIV
+ *                           created to surround the content.
+ *     attachTo              Indicates the element to append the
+ *                           content to. If not specified,
+ *                           document.body is used.
+ *
+ * @method loadHTML
+ * @static
+ * @param theFileName {String}          the file or URL to laod
+ * @param options {Object}              An array of options, as follows:
+ * @param completion {Function}           A function called when loading is
  *                              complete. Of the form fn ( successOrFailure )
  *                              so that success or failure of the load
  *                              can be determined.
@@ -409,8 +555,10 @@ PKUTIL.loadHTML = function(theFileName, options, completion)
  * Retrieves a JSON string from the specified URL, and executes completion.
  * Completion must be of the form ( success, data ).
  *
- * @param theURL     the URL or Filename
- * @param completion function of the from ( success, data )
+ * @method loadJSON
+ * @static
+ * @param theURL {String}    the URL or Filename
+ * @param completion {Function} function of the from ( success, data )
  *
  */
 PKUTIL.loadJSON = function(theURL, completion)
@@ -444,6 +592,9 @@ PKUTIL.loadJSON = function(theURL, completion)
  * Loads a URL in a popup window. Uses ChildBrowser for PG 2.2.x or
  * lower, and in-app browser for 2.3 or higher.
  *
+ * @method showURL
+ * @static
+ * @param theURL {String}
  */
 PKUTIL.showURL = function(theURL)
 {
@@ -479,6 +630,11 @@ PKUTIL.showURL = function(theURL)
  * as an instance of the supplied template (templateElement). Any %VAR% are
  * replaced by VAR from the replacements object.
  *
+ * @method instanceOfTemplate
+ * @static
+ * @param template {DOMElement|String}
+ * @param replacements {Array}
+ * @returns {String}
  **/
 
 PKUTIL.instanceOfTemplate = function(templateElement, replacements)
@@ -493,19 +649,88 @@ PKUTIL.instanceOfTemplate = function(templateElement, replacements)
   }
   return templateHTML;
 }
+
+
+/**
+ * Returns a psuedo-GUID. Not guaranteed to be unique, but pretty close.
+ * see http://stackoverflow.com/a/8809472
+ * @method getGUID
+ * @static
+ * @returns {String}
+ */
+PKUTIL.getGUID = function() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+/**
+ * Returns the current unix time
+ *
+ * @method getUnixTime
+ * @static
+ * @returns Number
+ */
+PKUTIL.getUnixTime = function ()
+{
+  return (new Date()).getTime();
+}
+
+
 /**
  *
  * Filename Handling
  *
  */
 PKUTIL.export ( "PKUTIL.FILE" );
+/**
+ * Basic filename handling is supported by PKUTIL.FILE. This includes
+ * dealing with invalid characters, parsing extensions and paths.
+ *
+ * @class PKUTIL.FILE
+ */
 PKUTIL.FILE = PKUTIL.FILE ||
 {
 };
+/**
+ * Specifies the characters that are not allowed in file names.
+ * @property invalidCharacters
+ * @static
+ * @type Array
+ * @default [ '/', '\', ':', '|', '<', '>', '*', '?', ';', '%' ]
+ */
 PKUTIL.FILE.invalidCharacters = "/,\\,:,|,<,>,*,?,;,%".split(",");
+/**
+ * Specifies the extension separator.
+ * @property extensionSeparator
+ * @static
+ * @type String
+ * @default "."
+ */
 PKUTIL.FILE.extensionSeparator = ".";
+/**
+ * Specifies the extension separator.
+ * @property extensionSeparator
+ * @static
+ * @type String
+ * @default "."
+ */
 PKUTIL.FILE.pathSeparator = "/";
 
+/**
+ * Converts a suspected invalid filename to a valid filename by replacing
+ * invalid characters (as specified in `invalidCharacters`) with
+ * dashes.
+ *
+ * @method convertToValidFileName
+ * @static
+ * @param theFileName {String} the file name to convert
+ * @returns {String} the converted file name
+ */
 PKUTIL.FILE.convertToValidFileName = function(theFileName)
 {
   var theNewFileName = theFileName;
@@ -519,7 +744,13 @@ PKUTIL.FILE.convertToValidFileName = function(theFileName)
   }
   return theNewFileName;
 }
-
+/**
+ * Returns the file (name) portion of a path.
+ *
+ * @method getFilePart
+ * @static
+ * @returns {String}
+ */
 PKUTIL.FILE.getFilePart = function(theFileName)
 {
   var theSlashPosition = theFileName.lastIndexOf(PKUTIL.FILE.pathSeparator);
@@ -530,6 +761,13 @@ PKUTIL.FILE.getFilePart = function(theFileName)
   return theFileName.substr(theSlashPosition + 1, theFileName.length - theSlashPosition);
 }
 
+/**
+ * Returns the path portion of a path (minus any filename).
+ *
+ * @method getPathPart
+ * @static
+ * @returns {String}
+ */
 PKUTIL.FILE.getPathPart = function(theFileName)
 {
   var theSlashPosition = theFileName.lastIndexOf(PKUTIL.FILE.pathSeparator);
@@ -540,6 +778,13 @@ PKUTIL.FILE.getPathPart = function(theFileName)
   return theFileName.substr(0, theSlashPosition + 1);
 }
 
+/**
+ * Returns the file name, minus the extension.
+ *
+ * @method getFileNamePart
+ * @static
+ * @returns {String}
+ */
 PKUTIL.FILE.getFileNamePart = function(theFileName)
 {
   var theFileNameNoPath = PKUTIL.FILE.getFilePart(theFileName);
@@ -551,6 +796,13 @@ PKUTIL.FILE.getFileNamePart = function(theFileName)
   return theFileNameNoPath.substr(0, theDotPosition);
 }
 
+/**
+ * Returns the extension, minus the file name.
+ *
+ * @method getFileNamePart
+ * @static
+ * @returns {String}
+ */
 PKUTIL.FILE.getFileExtensionPart = function(theFileName)
 {
   var theFileNameNoPath = PKUTIL.FILE.getFilePart(theFileName);
@@ -560,23 +812,6 @@ PKUTIL.FILE.getFileExtensionPart = function(theFileName)
     return "";
   }
   return theFileNameNoPath.substr(theDotPosition + 1, theFileNameNoPath.length - theDotPosition - 1);
-}
-
-// sometimes one needs a psuedo-guid:
-// see http://stackoverflow.com/a/8809472
-PKUTIL.getGUID = function() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = (d + Math.random()*16)%16 | 0;
-        d = Math.floor(d/16);
-        return (c=='x' ? r : (r&0x7|0x8)).toString(16);
-    });
-    return uuid;
-}
-
-PKUTIL.getUnixTime = function ()
-{
-  return (new Date()).getTime();
 }
 
 
