@@ -1,11 +1,11 @@
-/******************************************************************************
- *
- * DEVICE
- * Author: Kerri Shotts
+/**
  *
  * This library includes functions that reflect the device and its current
  * state
- *
+ * @module PKDEVICE
+ * @requires PKUTIL
+ * @author Kerri Shotts
+ * @version 0.3
  ******************************************************************************/
 
 /*jshint
@@ -29,21 +29,58 @@
 /*global device, PKUTIL */
 if (PKUTIL) { if (PKUTIL.export) { PKUTIL.export ( "PKDEVICE" ); } }
 
+/**
+ *
+ * PKDEVICE provides simple methods for getting device information, such as platform,
+ * form factor, and orientation.
+ *
+ * @class PKDEVICE
+ */
 var PKDEVICE = PKDEVICE ||
 {
 };
 // create the namespace
+
+/**
+ * The version of the class with major, minor, and rev properties.
+ *
+ * @property version
+ * @type Object
+ *
+ */
 PKDEVICE.version = { major: 0, minor: 3, rev: 100 };
+
+/**
+ * Permits overriding the platform for testing. Leave set to `false` for
+ * production applications.
+ *
+ * @property platformOverride
+ * @type boolean
+ * @default false
+ */
 PKDEVICE.platformOverride = false;
-// change me for testing in a browser...
+/**
+ * Permits overriding the form factor. Usually used for testing.
+ *
+ * @property formFactorOverride
+ * @type boolean
+ * @default false
+ */
 PKDEVICE.formFactorOverride = false;
-// change me for testing in a browser
 
 /**
  *
  * Returns the device platform, lowercased. If PKDEVICE.platformOverride is
  * other than "false", it is returned instead.
  *
+ * See PhoneGap's documentation on the full range of platforms that can be
+ * returned; without PG available, the method will attemt to determine the
+ * platform from `navigator.platform` and the `userAgent`, but only supports
+ * iOS and Android in that capacity.
+ *
+ * @method platform
+ * @static
+ * @returns {String} the device platform, lowercase.
  */
 PKDEVICE.platform = function()
 {
@@ -94,12 +131,16 @@ PKDEVICE.platform = function()
   }
   return thePlatform;
 }
+
 /**
  *
  * Returns the device's form factor. Possible values are "tablet" and
  * "phone". If PKDEVICE.formFactorOverride is not false, it is returned
  * instead.
  *
+ * @method formFactor
+ * @static
+ * @returns {String} `tablet` or `phone`, as appropriate
  */
 PKDEVICE.formFactor = function()
 {
@@ -129,6 +170,9 @@ PKDEVICE.formFactor = function()
  *
  * Determines if the device is in Portrait orientation.
  *
+ * @method isPortrait
+ * @static
+ * @returns {boolean} `true` if the device is in a Portrait orientation; `false` otherwise
  */
 PKDEVICE.isPortrait = function()
 {
@@ -138,6 +182,9 @@ PKDEVICE.isPortrait = function()
  *
  * Determines if the device is in Landscape orientation.
  *
+ * @method isLandscape
+ * @static
+ * @returns {boolean} `true` if the device is in a landscape orientation; `false` otherwise
  */
 PKDEVICE.isLandscape = function()
 {
@@ -151,27 +198,58 @@ PKDEVICE.isLandscape = function()
  *
  * Determines if the device is a hiDPI device (aka retina)
  *
+ * @method isRetina
+ * @static
+ * @returns {boolean} `true` if the device has a `window.devicePixelRatio` greater than `1.0`; `false` otherwise
  */
 PKDEVICE.isRetina = function()
 {
   return window.devicePixelRatio > 1;
 }
 
+/**
+ * Returns `true` if the device is an iPad.
+ *
+ * @method iPad
+ * @static
+ * @returns {boolean}
+ */
 PKDEVICE.iPad = function ()
 {
   return PKDEVICE.platform()==="ios" && PKDEVICE.formFactor()==="tablet";
 }
 
+/**
+ * Returns `true` if the device is an iPhone (or iPod).
+ *
+ * @method iPhone
+ * @static
+ * @returns {boolean}
+ */
 PKDEVICE.iPhone = function ()
 {
   return PKDEVICE.platform()==="ios" && PKDEVICE.formFactor()==="phone";
 }
 
+/**
+ * Returns `true` if the device is an Android Phone.
+ *
+ * @method droidPhone
+ * @static
+ * @returns {boolean}
+ */
 PKDEVICE.droidPhone = function ()
 {
   return PKDEVICE.platform()==="android" && PKDEVICE.formFactor()==="phone";
 }
 
+/**
+ * Returns `true` if the device is an Android Tablet.
+ *
+ * @method droidTablet
+ * @static
+ * @returns {boolean}
+ */
 PKDEVICE.droidTablet = function ()
 {
   return PKDEVICE.platform()==="android" && PKDEVICE.formFactor()==="tablet";
