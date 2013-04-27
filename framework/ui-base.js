@@ -25,8 +25,8 @@
          white:false,
          onevar:false 
  */
-/*global PKUTIL, PKDEVICE */
-PKUTIL.require ( ["PKUTIL", "PKDEVICE"], function () 
+/*global PKUTIL, PKDEVICE, PKObject */
+PKUTIL.require ( ["PKUTIL", "PKDEVICE", "PKObject"], function () 
 { 
     PKUTIL.export ( [ "UI", "UI.COLOR", "UI.FONT", "UI.SHADOW" ] );
 });
@@ -1207,3 +1207,237 @@ UI.cancelEvent = function ( e )
   }
 }
 
+/**
+ * Translates touch events to mouse events if the platform doesn't support
+ * touch events. Leaves other events unaffected.
+ *
+ * @method _translateEvent
+ * @static
+ * @private
+ * @param theEvent {String} the event name to translate
+ */
+UI._translateEvent = function ( theEvent )
+{
+  var theTranslatedEvent = theEvent;
+  if (!theTranslatedEvent) { return theTranslatedEvent; }
+  var nonTouchPlatform = ( PKDEVICE.platform() == "wince" || PKDEVICE.platform() == "unknown" );
+  if (nonTouchPlatform && theTranslatedEvent.toLowerCase().indexOf("touch") > -1 )
+  {
+    theTranslatedEvent = theTranslatedEvent.replace("touch", "mouse");
+    theTranslatedEvent = theTranslatedEvent.replace("start", "down");
+    theTranslatedEvent = theTranslatedEvent.replace("end", "up");
+  }
+  return theTranslatedEvent;  
+}
+
+/**
+ * Adds a touch listener to theElement, converting touch events for WP7.
+ *
+ * @method _addEventListener
+ * @static
+ * @private
+ * @param theElement {DOMElement} the element to attach the event to
+ * @param theEvent {String} the event to handle
+ * @param theFunction {Function} the function to call when the event is fired
+ *
+ */
+UI._addEventListener = function(theElement, theEvent, theFunction)
+{
+  var theTranslatedEvent = UI._translateEvent(theEvent.toLowerCase());
+  theElement.addEventListener(theTranslatedEvent, theFunction, false);
+}
+
+/**
+ * Removes a touch listener added by addTouchListener
+ *
+ * @method _removeEventListener
+ * @static
+ * @private
+ * @param theElement {DOMElement} the element to remove an event from
+ * @param theEvent {String} the event to remove
+ * @param theFunction {Function} the function to remove
+ *
+ */
+UI._removeEventListener = function(theElement, theEvent, theFunction)
+{
+  var theTranslatedEvent = UI._translateEvent(theEvent.toLowerCase());
+  theElement.removeEventListener(theTranslatedEvent, theFunction);
+}
+
+/**
+ * Manages the root element
+ *
+ * @property _rootElement
+ * @private
+ * @static
+ * @type DOMElement
+ */
+UI._rootElement = null;
+/**
+ * Creates the root element that contains the view hierarchy
+ *
+ * @method _createRootElement
+ * @static
+ * @private
+ */
+UI._createRootElement = function ()
+{
+  UI._rootElement = document.createElement ("div");
+  UI._rootElement.className = "container";
+  UI._rootElement.id = "rootContainer";
+  document.body.appendChild (UI._rootElement);
+}
+
+/**
+ * Mangage the element used to prevent unwanted clicks
+ *
+ * @property _clickPreventionElement
+ * @private
+ * @static
+ * @type DOMElement
+ */
+UI._clickPreventionElement = null;
+/**
+ * Creates the Click Prevention element
+ *
+ * @method _createClickPreventionElement
+ * @private
+ * @static
+ */
+UI._createClickPreventionElement = function ()
+{
+  UI._clickPreventionElement = document.createElement ("div");
+  UI._clickPreventionElement.id = "preventClicks";
+  document.body.appendChild (UI._clickPreventionElement);
+}
+
+/**
+ * Manages the root view (topmost)
+ *
+ * @property _rootView
+ * @private
+ * @static
+ * @type View
+ * @default null
+ */
+UI._rootView = null;
+
+/**
+ * Assigns a view to be the top view in the hierarchy
+ *
+ * @method setRootView
+ * @static
+ * @param theView {View}
+ */
+UI.setRootView = function ( theView )
+{
+  if (!UI._rootElement)
+  {
+    UI._createRootElement();
+    UI._createClickPreventionElement();
+  }
+  if (UI._rootView)
+  {
+    UI.removeRootView();
+  }
+  UI._rootView = theView;
+  UI._rootElement.appendChild(theView._element);
+}
+
+/**
+ * Removes a view from the root view
+ *
+ * @method removeRootView
+ * @static
+ */
+UI.removeRootView = function ()
+{
+  UI._rootElement.removeChild(UI._rootView._element);
+  UI._rootView = null;
+}
+
+/**
+ *
+ * Returns the root view
+ *
+ * @method getRootView
+ * @static
+ * @returns {View}
+ */
+UI.getRootView = function ()
+{
+  return UI._rootView;
+}
+
+UI._BackButtonHandler = function ()
+{
+  var self = new PKObject();
+  self.subclass ( "BackButtonHandler" );
+  self.registerNotification ( "backButtonPressed" );
+  self.handleBackButton = function ()
+  {
+    self.notify ("backButtonPressed");
+  }
+  document.addEventListener('backbutton', self.handleBackButton, false);
+  return self;
+}
+/**
+ *
+ * Global Back Button Handler Object
+ *
+ * Register a listener for the backButtonPressed notification in order
+ * to be notified when the back button is pressed.
+ *
+ * Applies only to a physical back button, not one on the screen.
+ *
+ * @property backButton
+ * @static
+ * @final
+ * @type _BackButtonHandler
+ */
+UI.backButton = new UI._BackButtonHandler();
+
+UI._OrientationHandler = function ()
+{
+  var self = new PKObject();
+  self.subclass ( "OrientationHandler" );
+  self.registerNotification ( "orientationChanged" );
+  self.handleOrientationChange = function ()
+  {
+    var curDevice;
+    var curOrientation;
+    var curFormFactor;
+    var curScale;
+    var curConvenience;
+
+    curDevice = PKDEVICE.platform();
+    curFormFactor = PKDEVICE.formFactor();
+    curOrientation = PKDEVICE.isPortrait() ? "portrait" : "landscape";
+    curScale = PKDEVICE.isRetina() ? "hiDPI" : "loDPI";
+    curConvenience = "";
+    if (PKDEVICE.iPad()) { curConvenience = "ipad"; }
+    if (PKDEVICE.iPhone()) { curConvenience = "iphone"; }
+    if (PKDEVICE.droidTablet()) { curConvenience = "droid-tablet"; }
+    if (PKDEVICE.droidPhone()) { curConvenience = "droid-phone"; }
+
+    document.body.setAttribute("class", curDevice + " " + curFormFactor + " " + curOrientation + " " + curScale + " " + curConvenience);
+
+    self.notify ("orientationChanged");
+  }
+  window.addEventListener('orientationchange', self.handleOrientationChange, false);
+  self.handleOrientationChange();
+  return self;
+}
+/**
+ *
+ * Global Orientation Handler Object
+ *
+ * Register a listener for the orientationChanged notification in order
+ * to be notified when the orientation changes.
+ *
+ * @property orientationHandler
+ * @static
+ * @final
+ * @type _OrientationHandler
+ */
+UI.orientationHandler = new UI._OrientationHandler();
