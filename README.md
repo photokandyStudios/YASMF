@@ -1,3 +1,7 @@
+# IMPORTANT NOTE
+
+YASMF has moved on to YASMF-Next (v0.4). It's available in its own repository at https://github.com/photokandyStudios/YASMF-Next. **NOTE**: v0.4 is not backwards compatible with v0.2.
+
 # YASMF: Yet Another Simple Mobile Framework
 
 The goal of YASMF is to provide a simple, light-weight framework that can be used to create performant Apps for Mobile Devices. It supports Webkit and Trident-based browsers, so it should work on a wide-variety of devices. That said, this framework specifically targets only Android, iOS, and WP7 (Mango).
